@@ -1,0 +1,8 @@
+order_id,product,quantity,unit_price
+1001,Ceramic mug,3,12.50
+1002,Steel water bottle,2,18.00
+1003,Canvas tote bag,,15.00
+1004,Wool beanie,1,twenty-two
+1005,Notebook dot grid,5,9.00
+1006,Ceramic mug,-1,12.50
+1007,Steel water bottle,4,18.00
