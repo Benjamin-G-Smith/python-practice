@@ -84,8 +84,8 @@ def group_by_service(entries: list[dict]) -> dict[str, list[dict]]:
             groupedEntries[entry['service']] = [entry]
         else:
             groupedEntries[entry['service']].append(entry)
-        print(groupedEntries)
-    raise NotImplementedError
+
+    return groupedEntries
 
 
 def error_rate_by_service(entries: list[dict]) -> dict[str, float]:
@@ -97,8 +97,55 @@ def error_rate_by_service(entries: list[dict]) -> dict[str, float]:
 
     TODO: implement this function.
     """
-    raise NotImplementedError
+    serviceCount = {}
 
+
+    #
+
+
+
+    # service count , error count 
+    # count the errors for each service and divide by total number of ERROR logs 
+    for entry in entries:
+        if entry["service"] not in serviceCount:
+            count = { "errors" : 0 , "total" : 0}
+            serviceCount[entry["service"]] = count
+            if entry["level"] == "ERROR":
+                serviceCount[entry["service"]]['errors'] = 1
+            
+            serviceCount[entry["service"]]['total']  = 1
+        else:
+            if entry["level"] == "ERROR":
+                serviceCount[entry["service"]]['errors'] += 1
+                serviceCount[entry["service"]]['total']  += 1
+            else:
+                serviceCount[entry["service"]]['total']  += 1
+
+    error_percentage = {}
+
+    for service in serviceCount:
+        error_percentage[service] = round(serviceCount[service]['errors'] / serviceCount[service]['total'],2)
+
+    return error_percentage
+
+def error_by_service(entries: list[dict]) -> dict:
+    serviceCount = {}
+
+    for entry in entries:
+        if entry["service"] not in serviceCount:
+            count = { "errors" : 0 , "total" : 0}
+            serviceCount[entry["service"]] = count
+            if entry["level"] == "ERROR":
+                serviceCount[entry["service"]]['errors'] = 1
+            
+            serviceCount[entry["service"]]['total']  = 1
+        else:
+            if entry["level"] == "ERROR":
+                serviceCount[entry["service"]]['errors'] += 1
+                serviceCount[entry["service"]]['total']  += 1
+            else:
+                serviceCount[entry["service"]]['total']  += 1
+    return serviceCount
 
 def top_error_services(entries: list[dict], n: int) -> list[str]:
     """
@@ -109,7 +156,16 @@ def top_error_services(entries: list[dict], n: int) -> list[str]:
 
     TODO: implement this function.
     """
-    raise NotImplementedError
+    counts = error_by_service(entries)
+    errorcounts = {}
+
+    for count in counts:
+        if counts[count]['errors'] != 0:
+            errorcounts[count] = counts[count]['errors']
+
+    soredErrorServices = sorted(errorcounts, key=lambda k: (-errorcounts[k],k))
+
+    return soredErrorServices[:n]
 
 
 def _self_check() -> None:
