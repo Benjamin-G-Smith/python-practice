@@ -1,6 +1,6 @@
 # python-practice
 
-Eight exercises, each modeled on a task you'd actually hit on the job. Every
+Nine exercises, each modeled on a task you'd actually hit on the job. Every
 exercise file has `TODO`-marked functions to fill in and a self-check block
 at the bottom — run the file directly to see if you got it right.
 
@@ -21,11 +21,11 @@ just the standard library.
 
 | # | File | Scenario | Skills |
 |---|------|----------|--------|
-| 1 | `exercises/01_basics/messy_log_cleanup.py` | Clean up inconsistent server log lines | strings, f-strings, loops |
-| 1b | `exercises/01_basics/log_analytics.py` | Part II of #1: batch-parse and group log lines into service-level stats | dict/list comprehensions, grouping, `str.split(maxsplit=...)`, sorting with a key function |
-| 1c | `exercises/01_basics/review_aggregator.py` | Per-category review stats for an e-commerce team | `dict.get(key, 0)`/`collections.defaultdict` for per-key counting (reinforces a bug from #1b) |
-| 1d | `exercises/01_basics/lazy_log_stream.py` | Process a log stream lazily instead of loading it all into memory | generators, `yield`, composing generators, stopping early |
-| 1e | `exercises/01_basics/rolling_error_window.py` | Track a service's error rate over just its most recent entries | `collections.deque` sliding window, `enumerate`, max-with-key |
+| 1.1 | `exercises/01_basics/messy_log_cleanup.py` | Clean up inconsistent server log lines | strings, f-strings, loops |
+| 1.2 | `exercises/01_basics/log_analytics.py` | Part II of #1.1: batch-parse and group log lines into service-level stats | dict/list comprehensions, grouping, `str.split(maxsplit=...)`, sorting with a key function |
+| 1.3 | `exercises/01_basics/review_aggregator.py` | Per-category review stats for an e-commerce team | `dict.get(key, 0)`/`collections.defaultdict` for per-key counting (reinforces a bug from #1.2) |
+| 1.4 | `exercises/01_basics/lazy_log_stream.py` | Process a log stream lazily instead of loading it all into memory | generators, `yield`, composing generators, stopping early |
+| 1.5 | `exercises/01_basics/rolling_error_window.py` | Track a service's error rate over just its most recent entries | `collections.deque` sliding window, `enumerate`, max-with-key |
 | 2 | `exercises/02_data_structures/inventory_manager.py` | Answer stock questions for a shop's inventory | dicts, lists, comprehensions |
 | 3 | `exercises/03_functions/expense_report.py` | Build a monthly expense report | functions, `*args`/`**kwargs`, defaults |
 | 4 | `exercises/04_files_and_errors/csv_import.py` | Import a messy sales CSV without crashing | file I/O, `csv` module, `try`/`except` |

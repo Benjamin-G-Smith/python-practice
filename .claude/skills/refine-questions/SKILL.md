@@ -62,16 +62,25 @@ then confirm the unsolved exercise version fails cleanly (raises
 
 ### Number it by recommended order, not creation order
 
-The README table's `#` column (`1`, `1b`, `1c`, ...) is read top-to-bottom
-as "do them in this order" — it is not a creation log. When the new
-exercise belongs *before* other exercises that already exist and are
-still unsolved (e.g. a reinforcing exercise inserted ahead of an
-already-planned escalation, because the weak spot needs fixing before
-building on top of it), give it the number that reflects where it should
-actually be attempted, and bump every existing unsolved row after that
-point up a letter to keep the sequence unbroken. Solved exercises don't
-need renumbering — only reorder rows for exercises that are still
-pending, since past history shouldn't shift.
+The README table's `#` column is read top-to-bottom as "do them in this
+order" — it is not a creation log. Numbering scheme: each topic folder
+gets a whole number matching its `NN_topic` prefix (`01_basics` → `1`,
+`02_data_structures` → `2`, ...). When a topic has more than one
+exercise, use decimals within that whole number — `1.1`, `1.2`, `1.3`,
+... — never plain sequential integers for the sub-items, since those
+would collide with the next topic's whole-number row (e.g. a second
+`01_basics` exercise numbered `2` would be indistinguishable from
+`02_data_structures`'s row `2`).
+
+When the new exercise belongs *before* other exercises that already
+exist and are still unsolved (e.g. a reinforcing exercise inserted ahead
+of an already-planned escalation, because the weak spot needs fixing
+before building on top of it), give it the decimal that reflects where
+it should actually be attempted, and bump every existing unsolved row
+after that point up a decimal to keep the sequence unbroken (e.g.
+inserting before `1.3` means the old `1.3`/`1.4` become `1.4`/`1.5`).
+Solved exercises don't need renumbering — only reorder rows for
+exercises that are still pending, since past history shouldn't shift.
 
 Also update anything else that names the old numbering/order:
 - Any "prerequisite" or "do X first" language in other exercises'
