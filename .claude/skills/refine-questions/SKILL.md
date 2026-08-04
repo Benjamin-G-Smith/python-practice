@@ -60,6 +60,31 @@ TODOs using the solution logic, run the self-check, confirm it passes,
 then confirm the unsolved exercise version fails cleanly (raises
 `NotImplementedError`, not a crash from bad sample data).
 
+### Number it by recommended order, not creation order
+
+The README table's `#` column (`1`, `1b`, `1c`, ...) is read top-to-bottom
+as "do them in this order" — it is not a creation log. When the new
+exercise belongs *before* other exercises that already exist and are
+still unsolved (e.g. a reinforcing exercise inserted ahead of an
+already-planned escalation, because the weak spot needs fixing before
+building on top of it), give it the number that reflects where it should
+actually be attempted, and bump every existing unsolved row after that
+point up a letter to keep the sequence unbroken. Solved exercises don't
+need renumbering — only reorder rows for exercises that are still
+pending, since past history shouldn't shift.
+
+Also update anything else that names the old numbering/order:
+- Any "prerequisite" or "do X first" language in other exercises'
+  docstrings or `projects/*/README.md` files that reference the
+  reordered exercises by name.
+- The `CLAUDE.md` "Progress notes" bullet for any exercise that's now
+  positioned after the new one — add an explicit "do `<new exercise>`
+  first" note if it doesn't already reflect the new order.
+
+If the new exercise is a straightforward escalation appended after
+everything else (the common case), it just gets the next letter/number
+in sequence — no reordering needed.
+
 ## 4. Hand it over
 
 Tell the user in one or two sentences what this exercise reinforces or
