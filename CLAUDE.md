@@ -122,26 +122,35 @@ knows where I left off and what I found hard.
       own edge-case assertions (empty input, unknown service, delimiter char
       inside message) and found a real bug: naive `split("|")` truncates a
       message that itself contains `|`. Fix is `split("|", maxsplit=3)`.
-- [ ] 01_basics — log_analytics (Part II of messy_log_cleanup): escalation
-      exercise targeting the maxsplit fix and hardcoded-index concern from
-      messy_log_cleanup, plus grouping into a dict of lists, per-group
-      aggregation, and `sorted(..., key=...)` with a tuple key for
-      descending+alphabetical tiebreak. In progress as of 2026-07-31:
-      `parse_logs` implemented correctly (keys-list + range loop over the
-      maxsplit result). `group_by_service` builds the dict correctly in its
-      loop but is missing `return groupedEntries` — it falls through to a
-      leftover `raise NotImplementedError` that was never deleted, and
-      there's a stray debug `print(groupedEntries)` still in the loop.
-      `error_rate_by_service` and `top_error_services` not started. Originally
-      created under `02_data_structures/`; moved to `01_basics/` (own choice,
-      2026-07-31) — solutions/ moved to match.
+- [x] 01_basics — log_analytics (Part II of messy_log_cleanup): completed
+      2026-07-31 (commit 4d84436). `parse_logs`/`group_by_service` were
+      clean (one missing `return` fix). `error_rate_by_service` had a real
+      off-by-one: the "first sighting" branch treated incrementing
+      `errors` and `total` as mutually exclusive instead of independent,
+      undercounting `total` by 1 whenever a service's first line was
+      `ERROR` — needed a hint to spot, then debugged by tracing actual
+      values. `top_error_services` needed hints for sort-by-value with
+      alphabetical tiebreak, top-n slicing, and filtering zero-count
+      entries; first attempt used `sorted(..., reverse=True)` which also
+      reversed the tiebreak, corrected to negating just the count.
+      Recurring pattern: manual `if key not in dict/else` branching
+      instead of `dict.get`/`defaultdict` — root cause of the off-by-one.
+      Also duplicated a counting loop (`error_by_service` vs.
+      `error_rate_by_service`) instead of one shared helper. Full
+      feedback logged in ember-vault Growth Areas.
+- [ ] 01_basics — review_aggregator: new, reinforcement exercise (via
+      refine-questions, 2026-07-31) targeting the recurring dict-counting
+      pattern from log_analytics head-on — new scenario (review stats by
+      category) but the same "two independent counters per key" shape
+      that caused the off-by-one, isolated from sorting/filtering this
+      time. Do this before lazy_log_stream. Not yet attempted.
 - [ ] 01_basics — lazy_log_stream: new, targets generators (`yield`),
       lazy iteration, composing generators. Self-check proves real laziness
       (counts how many raw lines get pulled to find the first 2 errors, and
       fails if the implementation secretly materializes a full list). Built
       as a prerequisite for projects/live_log_monitor. Originally created
       under `02_data_structures/`; moved to `01_basics/` (own choice,
-      2026-07-31). Not yet attempted.
+      2026-07-31). Do review_aggregator first. Not yet attempted.
 - [ ] 01_basics — rolling_error_window: new, targets
       `collections.deque(maxlen=...)` for a fixed-size sliding window, plus
       `enumerate`/max-with-key. Works on a flat single-service list — the
