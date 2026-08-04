@@ -46,7 +46,12 @@ def count_by_category(reviews: list[dict]) -> dict[str, int]:
     Hint: dict.get(key, 0) + 1, one line per review, no "if key not in
     dict" branch needed.
     """
-    raise NotImplementedError
+    categoryCounts = {}
+    for review in reviews:
+         categoryCounts[review["category"]] = categoryCounts.get(review["category"],0 ) + 1
+    
+    return categoryCounts
+
 
 
 def positive_rate_by_category(reviews: list[dict]) -> dict[str, float]:
@@ -67,7 +72,23 @@ def positive_rate_by_category(reviews: list[dict]) -> dict[str, float]:
     counters per category without needing a branch for "first time
     seeing this category."
     """
-    raise NotImplementedError
+    categoryCounts = count_by_category(reviews)
+    percentPositive = {}
+    positiveCounts = {}
+    for review in reviews:
+        if review["rating"] >= 4:
+            positiveCounts[review["category"]] = positiveCounts.get(review["category"], 0 ) + 1
+
+
+    for category in categoryCounts.keys():
+        if category not in positiveCounts:
+            percentPositive[category] = 0.0
+        else:
+            percent = round((positiveCounts[category] / categoryCounts[category]),2)
+            percentPositive[category] = percentPositive.get(category, 0 ) + percent
+
+
+    return percentPositive
 
 
 def top_category(reviews: list[dict]) -> str:
@@ -77,7 +98,19 @@ def top_category(reviews: list[dict]) -> str:
 
     TODO: implement this function.
     """
-    raise NotImplementedError
+    categoryCounts = count_by_category(reviews)
+    topReview = max(categoryCounts,key=lambda k: ( categoryCounts[k], k))
+
+
+    # alternative 
+    # highest_seen = 0
+    # topReview = ""
+    # for category in categoryCounts:
+    #     if categoryCounts[category] > highest_seen:
+    #         highest_seen = categoryCounts[category]
+    #         topReview = category
+    
+    return topReview
 
 
 def _self_check() -> None:
