@@ -63,8 +63,30 @@ must follow exactly:
 - Sample data as module-level constants.
 - Functions with docstrings describing the contract, bodies replaced with
   `# TODO: implement this function` + `raise NotImplementedError`.
-- A `_self_check()` function at the bottom using plain `assert` with
-  descriptive failure messages, called under `if __name__ == "__main__":`.
+- A `_self_check()` function at the bottom, called under
+  `if __name__ == "__main__":`, using the **per-function tally format**
+  (adopted 2026-08-05, see `rolling_error_window.py` for the concrete
+  example): a local `check(func_name, condition, message)` helper that
+  records pass/fail per function instead of a bare `assert` that halts
+  at the first failure, plus a `not_implemented(func_name, count)`
+  helper for a `try/except NotImplementedError` around each function's
+  block of checks (so one unfinished function doesn't prevent the
+  others from being tested and reported). Print a per-function
+  `name: passed/total passed` tally, then raise `AssertionError` with a
+  summary line if anything failed, or print `"All checks passed."` if
+  not. Still no pytest — this is a small addition on top of plain
+  checks, not a framework. Functions with checks that depend on another
+  function's output (e.g. `first_breach` taking `rolling_error_rate`'s
+  result) should test against a hardcoded known-correct constant instead
+  of the live value, so one function's bug doesn't cascade into another
+  function's tally looking broken.
+  **Scope note**: this replaced the older single-`assert`-per-line
+  format going forward only — exercises written before 2026-08-05
+  (`messy_log_cleanup.py`, `log_analytics.py`, `review_aggregator.py`,
+  `lazy_log_stream.py`, and the untouched `inventory_manager.py`,
+  `expense_report.py`, `csv_import.py`, `task_tracker.py`) were not
+  retrofitted and still use plain `assert`. Don't "fix" them to match
+  unless asked — this was a deliberate choice, not an oversight.
 - A mirrored, fully-implemented version in `solutions/<same relative path>`.
 - Add a row to the exercise table in README.md.
 - If a function's docstring makes a claim about failure/edge-case

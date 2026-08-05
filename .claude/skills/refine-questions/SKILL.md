@@ -50,15 +50,21 @@ exercise went well.
 Follow the exact format described in `CLAUDE.md` under "Creating new
 exercises": scenario docstring naming the skills it drills, sample data as
 module constants, TODO functions raising `NotImplementedError`, a
-`_self_check()` with descriptive asserts, a mirrored file in `solutions/`,
-and a new row in the README table. Put it in the matching `exercises/NN_topic/`
-folder — only create a new topic folder when genuinely moving to a new
-subject area, not for a harder variant of an existing one.
+`_self_check()` using the per-function tally format (see
+`rolling_error_window.py` for the concrete pattern — not the older
+single-`assert` format used in exercises before 2026-08-05), a mirrored
+file in `solutions/`, and a new row in the README table. Put it in the
+matching `exercises/NN_topic/` folder — only create a new topic folder
+when genuinely moving to a new subject area, not for a harder variant of
+an existing one.
 
 Verify the new exercise before handing it over: temporarily fill in the
 TODOs using the solution logic, run the self-check, confirm it passes,
-then confirm the unsolved exercise version fails cleanly (raises
-`NotImplementedError`, not a crash from bad sample data).
+then confirm the unsolved exercise version fails cleanly — with the
+tally format, that means every function shows `0/N passed` with a `not
+implemented` message, ending in `AssertionError`, not a crash from bad
+sample data or a `NameError` from a check that depended on another
+function's unimplemented output.
 
 ### Number it by recommended order, not creation order
 
