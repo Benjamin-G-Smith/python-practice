@@ -44,7 +44,7 @@ vault's own session-entry guidelines (see
 `~/Documents/ember-vault/_system/wrap-up-protocol.md` if you want the
 full house style).
 
-## 3. Review the final implementation and give feedback
+## 3. Review the final implementation
 
 Read the finished file (not just the diff) and actually assess the code
 — this is the same "mention a cleaner idiom once it's passing" behavior
@@ -60,12 +60,44 @@ so it isn't skipped and actually gets recorded. Look for things like:
   after themselves unprompted, good edge-case instincts. Progress
   tracking needs the wins recorded too, not only the gaps.
 
-Ground every point in the actual code you just read — don't invent
-generic advice. This doesn't mean rewriting their code; per CLAUDE.md,
-only mention it, don't apply it unless asked. Keep 2-4 bullets, the
-sharpest observations, not an exhaustive lint pass.
+Then separately, check for **conceptual** gaps — not the same thing as
+code style. A function can be correct, idiomatic, and self-check-green
+while the user still doesn't fully understand *why* it works: an
+explanation earlier in the conversation that was slightly off before
+being corrected, a "did I do this the right way" question that surfaced
+a real subtlety, a pattern applied correctly but by copying shape rather
+than reasoning (e.g. reused a tuple sort key without being able to say
+why the tiebreak works). Pull these from the actual conversation, not
+from re-reading the code alone — code review finds style issues,
+conceptual gaps mostly show up in how the user talked about the problem.
 
-## 4. Commit to git
+Read `~/Documents/ember-vault/projects/python-practice.md`'s existing
+`## Growth Areas` section (if the file exists) before finalizing either
+list — a pattern worth flagging is one that either connects to
+established history (recurring, or resolving one already tracked) or is
+new and worth starting to track, not a one-off nitpick.
+
+## 4. Present the evaluation and discuss — before committing
+
+This is a checkpoint, not a formality. Tell the user directly, in chat:
+
+- **Patterns to reinforce**: code-level habits from step 3, framed
+  against history where relevant ("this is the third time X has come
+  up" / "this is resolved — didn't recur this time").
+- **Where understanding might be incomplete**: the conceptual gaps from
+  step 3, named plainly (what the idea actually is, not just that
+  something was slightly off).
+- **Genuine strengths**: don't skip these — an evaluation that's only
+  gaps is a worse read of real progress than one that shows both.
+
+Give the user room to respond — ask a follow-up, push back, fix
+something — before moving on. Once that's settled (they confirm, ask a
+question and you answer it, or say to just move on), continue to step 5.
+Don't treat this step as skippable busywork before the "real" commit
+step; the commit and vault entry in steps 5-6 should reflect whatever
+came out of this discussion, not bypass it.
+
+## 5. Commit to git
 
 - Stage only the files actually relevant to this lesson (the exercise
   file, and `README.md`/`CLAUDE.md` if they were updated as part of it)
@@ -73,13 +105,13 @@ sharpest observations, not an exhaustive lint pass.
 - Commit message:
   - Subject: one line, what was done (e.g. `Solve log_analytics.py:
     parse_logs, group_by_service, error_rate_by_service`).
-  - Body: the bullets from step 2, condensed. Keep the step 3 feedback
+  - Body: the bullets from step 2, condensed. Keep the step 3/4 feedback
     out of the commit body — that belongs in the vault, not git history.
   - Footer: `Logged in ember-vault: projects/python-practice.md`
 - After committing, get the short hash: `git rev-parse --short HEAD`.
   You'll reference it in the vault entry.
 
-## 5. Update the vault project file
+## 6. Update the vault project file
 
 Path: `/Users/bensmith/Documents/ember-vault/projects/python-practice.md`
 
@@ -126,7 +158,9 @@ Python (stdlib-only for exercises), uv + ruff, plain-assert self-checks
 - Rewrite `## Next action` with the single most useful next step.
 - Add any genuinely new, durable idiom/decision to `## Key decisions`
   (don't duplicate ones already listed).
-- Update `## Growth Areas` with the feedback from step 3:
+- Update `## Growth Areas` with the evaluation from steps 3-4 — code
+  patterns *and* conceptual gaps, plus anything that came out of the
+  discussion in step 4 (a follow-up question, a correction, agreement):
   - This section tracks *recurring* patterns over time, not a per-session
     dump — it's what makes progress evaluable across sessions instead of
     feedback disappearing into a single chat.
@@ -147,7 +181,7 @@ Python (stdlib-only for exercises), uv + ruff, plain-assert self-checks
   <!-- session {"id":"sess-N","created_at":UNIX_TIMESTAMP} -->
   ### [Title] — YYYY-MM-DD
   - [bullets from step 2]
-  - Feedback: [1-2 line condensed version of the step 3 review]
+  - Feedback: [1-2 line condensed version of the steps 3-4 evaluation]
   - commit: <short-hash> "<commit subject>"
   <!-- /session -->
   ```
@@ -158,11 +192,12 @@ Do **not** touch `~/Documents/ember-vault/_index.md` — the vault's own
 `/ember_wrap` protocol doesn't touch it either; that table is maintained
 manually by the user.
 
-## 6. Report back
+## 7. Confirm it's logged
 
-Tell the user, in a few sentences: what got committed (short hash +
-subject), the code-quality feedback from step 3, and that the vault
-entry was updated/created, with the vault file path.
+The substantive discussion already happened in step 4 — this is just a
+short close-out, not a repeat of the evaluation. Tell the user, in a
+sentence or two: what got committed (short hash + subject), and that
+the vault entry was updated/created, with the vault file path.
 
 ## Don't
 
@@ -173,5 +208,8 @@ entry was updated/created, with the vault file path.
   actually come up / actually appear in the code you read.
 - Don't stage or commit unrelated in-progress work from other exercises.
 - Don't touch `_index.md` in the vault.
-- Don't turn the step 3 review into unsolicited code changes — feedback
+- Don't turn the step 3/4 review into unsolicited code changes — feedback
   gets mentioned and logged, not applied, unless the user asks.
+- Don't skip step 4 or fold it silently into step 7's close-out — the
+  user asked for this specifically as a distinct discussion checkpoint
+  before committing, not a line in a final summary.
