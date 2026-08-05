@@ -79,7 +79,11 @@ must follow exactly:
   function's output (e.g. `first_breach` taking `rolling_error_rate`'s
   result) should test against a hardcoded known-correct constant instead
   of the live value, so one function's bug doesn't cascade into another
-  function's tally looking broken.
+  function's tally looking broken. Aim for at least ~6 checks per
+  function, not just one happy-path case — cover edge cases genuinely
+  relevant to that function's contract (empty input, a boundary named in
+  the docstring, a tie/degenerate case that would let a bug default to
+  the right answer by accident, etc.), not padding for a round number.
   **Scope note**: this replaced the older single-`assert`-per-line
   format going forward only — exercises written before 2026-08-05
   (`messy_log_cleanup.py`, `log_analytics.py`, `review_aggregator.py`,

@@ -70,6 +70,14 @@ def max_window_rate(entries: list[dict], window_size: int) -> tuple[int, float]:
 # function doesn't make an unrelated function's checks look broken too.
 EXPECTED_RATES = [0.0, 0.0, 0.33, 0.5, 0.5, 0.75, 0.5, 0.25, 0.5, 0.25]
 
+ALL_INFO = [{"level": "INFO"}] * 3
+ALL_ERROR = [{"level": "ERROR"}] * 3
+
+# Three-way tie (indices 2, 3, 4 all land on the same rate) - the real
+# test of "earliest index wins," since a window_size=1 or all-one-level
+# dataset would let a bug default to the right answer by accident.
+TIE_ENTRIES = [{"level": lvl} for lvl in ["INFO", "ERROR", "ERROR", "INFO", "ERROR", "INFO"]]
+
 
 def _self_check() -> None:
     """
@@ -93,8 +101,31 @@ def _self_check() -> None:
     try:
         rates = rolling_error_rate(ENTRIES, window_size=4)
         check("rolling_error_rate", rates == EXPECTED_RATES, f"unexpected rates: {rates}")
+
+        r = rolling_error_rate(ALL_INFO, window_size=2)
+        check("rolling_error_rate", r == [0.0, 0.0, 0.0], f"all-INFO should be all 0.0, got {r}")
+
+        r = rolling_error_rate(ALL_ERROR, window_size=2)
+        check("rolling_error_rate", r == [1.0, 1.0, 1.0], f"all-ERROR should be all 1.0, got {r}")
+
+        r = rolling_error_rate(ENTRIES, window_size=1)
+        check(
+            "rolling_error_rate",
+            r == [0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0],
+            f"window_size=1 should be each entry's own level as 0.0/1.0, got {r}",
+        )
+
+        r = rolling_error_rate(ENTRIES, window_size=100)
+        check(
+            "rolling_error_rate",
+            r == [0.0, 0.0, 0.33, 0.5, 0.4, 0.5, 0.43, 0.38, 0.44, 0.4],
+            f"window larger than the list should use however many entries exist so far, got {r}",
+        )
+
+        r = rolling_error_rate([], window_size=4)
+        check("rolling_error_rate", r == [], f"empty input should return [], got {r}")
     except NotImplementedError:
-        not_implemented("rolling_error_rate", 1)
+        not_implemented("rolling_error_rate", 6)
 
     try:
         check(
@@ -107,8 +138,28 @@ def _self_check() -> None:
             first_breach(EXPECTED_RATES, 0.9) is None,
             f"no rate ever reaches 0.9, expected None, got {first_breach(EXPECTED_RATES, 0.9)}",
         )
+        check(
+            "first_breach",
+            first_breach(EXPECTED_RATES, 0.75) == 5,
+            f"exact-match threshold should still count (>=), expected index 5, got {first_breach(EXPECTED_RATES, 0.75)}",
+        )
+        check(
+            "first_breach",
+            first_breach(EXPECTED_RATES, 0.0) == 0,
+            f"threshold 0.0 should match immediately at index 0, got {first_breach(EXPECTED_RATES, 0.0)}",
+        )
+        check(
+            "first_breach",
+            first_breach([], 0.5) is None,
+            f"empty rates list should return None, got {first_breach([], 0.5)}",
+        )
+        check(
+            "first_breach",
+            first_breach(EXPECTED_RATES, 1.0) is None,
+            f"no rate reaches 1.0, expected None, got {first_breach(EXPECTED_RATES, 1.0)}",
+        )
     except NotImplementedError:
-        not_implemented("first_breach", 2)
+        not_implemented("first_breach", 6)
 
     try:
         check(
@@ -116,8 +167,33 @@ def _self_check() -> None:
             max_window_rate(ENTRIES, window_size=4) == (5, 0.75),
             f"unexpected max_window_rate: {max_window_rate(ENTRIES, window_size=4)}",
         )
+        check(
+            "max_window_rate",
+            max_window_rate(ENTRIES, window_size=1) == (2, 1.0),
+            f"window_size=1 should find the earliest ERROR entry, got {max_window_rate(ENTRIES, window_size=1)}",
+        )
+        check(
+            "max_window_rate",
+            max_window_rate(ALL_ERROR, window_size=2) == (0, 1.0),
+            f"unexpected max_window_rate on all-ERROR: {max_window_rate(ALL_ERROR, window_size=2)}",
+        )
+        check(
+            "max_window_rate",
+            max_window_rate(TIE_ENTRIES, window_size=3) == (2, 0.67),
+            f"three-way tie should resolve to the earliest index (2), got {max_window_rate(TIE_ENTRIES, window_size=3)}",
+        )
+        check(
+            "max_window_rate",
+            max_window_rate(ALL_INFO, window_size=2) == (0, 0.0),
+            f"unexpected max_window_rate on all-INFO: {max_window_rate(ALL_INFO, window_size=2)}",
+        )
+        check(
+            "max_window_rate",
+            max_window_rate(ENTRIES, window_size=100) == (3, 0.5),
+            f"unexpected max_window_rate with an oversized window: {max_window_rate(ENTRIES, window_size=100)}",
+        )
     except NotImplementedError:
-        not_implemented("max_window_rate", 1)
+        not_implemented("max_window_rate", 6)
 
     print()
     all_passed = True
