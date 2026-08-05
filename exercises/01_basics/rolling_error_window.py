@@ -138,21 +138,14 @@ def _self_check() -> None:
             first_breach(EXPECTED_RATES, 0.9) is None,
             f"no rate ever reaches 0.9, expected None, got {first_breach(EXPECTED_RATES, 0.9)}",
         )
-        check(
-            "first_breach",
-            first_breach(EXPECTED_RATES, 0.75) == 5,
-            f"exact-match threshold should still count (>=), expected index 5, got {first_breach(EXPECTED_RATES, 0.75)}",
-        )
-        check(
-            "first_breach",
-            first_breach(EXPECTED_RATES, 0.0) == 0,
-            f"threshold 0.0 should match immediately at index 0, got {first_breach(EXPECTED_RATES, 0.0)}",
-        )
-        check(
-            "first_breach",
-            first_breach([], 0.5) is None,
-            f"empty rates list should return None, got {first_breach([], 0.5)}",
-        )
+        b = first_breach(EXPECTED_RATES, 0.75)
+        check("first_breach", b == 5, f"exact-match threshold should still count (>=), got {b}")
+
+        b = first_breach(EXPECTED_RATES, 0.0)
+        check("first_breach", b == 0, f"threshold 0.0 should match immediately at index 0, got {b}")
+
+        b = first_breach([], 0.5)
+        check("first_breach", b is None, f"empty rates list should return None, got {b}")
         check(
             "first_breach",
             first_breach(EXPECTED_RATES, 1.0) is None,
@@ -167,31 +160,20 @@ def _self_check() -> None:
             max_window_rate(ENTRIES, window_size=4) == (5, 0.75),
             f"unexpected max_window_rate: {max_window_rate(ENTRIES, window_size=4)}",
         )
-        check(
-            "max_window_rate",
-            max_window_rate(ENTRIES, window_size=1) == (2, 1.0),
-            f"window_size=1 should find the earliest ERROR entry, got {max_window_rate(ENTRIES, window_size=1)}",
-        )
-        check(
-            "max_window_rate",
-            max_window_rate(ALL_ERROR, window_size=2) == (0, 1.0),
-            f"unexpected max_window_rate on all-ERROR: {max_window_rate(ALL_ERROR, window_size=2)}",
-        )
-        check(
-            "max_window_rate",
-            max_window_rate(TIE_ENTRIES, window_size=3) == (2, 0.67),
-            f"three-way tie should resolve to the earliest index (2), got {max_window_rate(TIE_ENTRIES, window_size=3)}",
-        )
-        check(
-            "max_window_rate",
-            max_window_rate(ALL_INFO, window_size=2) == (0, 0.0),
-            f"unexpected max_window_rate on all-INFO: {max_window_rate(ALL_INFO, window_size=2)}",
-        )
-        check(
-            "max_window_rate",
-            max_window_rate(ENTRIES, window_size=100) == (3, 0.5),
-            f"unexpected max_window_rate with an oversized window: {max_window_rate(ENTRIES, window_size=100)}",
-        )
+        m = max_window_rate(ENTRIES, window_size=1)
+        check("max_window_rate", m == (2, 1.0), f"window_size=1 should find first error, got {m}")
+
+        m = max_window_rate(ALL_ERROR, window_size=2)
+        check("max_window_rate", m == (0, 1.0), f"unexpected max_window_rate on all-ERROR: {m}")
+
+        m = max_window_rate(TIE_ENTRIES, window_size=3)
+        check("max_window_rate", m == (2, 0.67), f"three-way tie should resolve earliest, got {m}")
+
+        m = max_window_rate(ALL_INFO, window_size=2)
+        check("max_window_rate", m == (0, 0.0), f"unexpected max_window_rate on all-INFO: {m}")
+
+        m = max_window_rate(ENTRIES, window_size=100)
+        check("max_window_rate", m == (3, 0.5), f"oversized window: {m}")
     except NotImplementedError:
         not_implemented("max_window_rate", 6)
 

@@ -86,7 +86,9 @@ def _self_check() -> None:
 
     errors_only = list(filter_by_level(stream_entries(RAW_LOGS_LARGE), "ERROR"))
     assert len(errors_only) == 4, f"expected 4 ERROR entries, got {len(errors_only)}"
-    assert all(e["level"] == "ERROR" for e in errors_only), "filter_by_level let a non-ERROR entry through"
+    assert all(e["level"] == "ERROR" for e in errors_only), (
+        "filter_by_level let a non-ERROR entry through"
+    )
 
     first_two_errors = take(filter_by_level(stream_entries(RAW_LOGS_LARGE), "ERROR"), 2)
     assert [e["service"] for e in first_two_errors] == ["payment-service", "inventory-service"], (
@@ -108,7 +110,7 @@ def _self_check() -> None:
     )
 
     print("All checks passed.")
-    print(f"Pulled only {pull_count['n']} of {len(RAW_LOGS_LARGE)} lines to find the first 2 errors.")
+    print(f"Pulled only {pull_count['n']} of {len(RAW_LOGS_LARGE)} lines to find 2 errors")
 
 
 if __name__ == "__main__":

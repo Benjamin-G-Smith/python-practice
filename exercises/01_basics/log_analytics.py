@@ -175,7 +175,9 @@ def _self_check() -> None:
         f"expected 9 valid entries (2 of the 11 raw lines are malformed), got {len(entries)}"
     )
 
-    tricky = next(e for e in entries if e["service"] == "inventory-service" and e["level"] == "ERROR")
+    tricky = next(
+        e for e in entries if e["service"] == "inventory-service" and e["level"] == "ERROR"
+    )
     assert tricky["message"] == "sync failed: timeout | retry_count=3", (
         f"message containing '|' should stay intact, got: {tricky['message']!r}"
     )
@@ -186,7 +188,7 @@ def _self_check() -> None:
         "auth-service": 3,
         "inventory-service": 2,
         "billing-service": 1,
-    }, f"unexpected group sizes: {{k: len(v) for k, v in groups.items()}}"
+    }, "unexpected group sizes: {k: len(v) for k, v in groups.items()}"
 
     rates = error_rate_by_service(entries)
     assert rates == {
@@ -199,11 +201,10 @@ def _self_check() -> None:
     assert top_error_services(entries, 2) == ["payment-service", "auth-service"], (
         f"unexpected top 2: {top_error_services(entries, 2)}"
     )
-    assert top_error_services(entries, 5) == [
-        "payment-service",
-        "auth-service",
-        "inventory-service",
-    ], f"unexpected top 5 (billing-service has 0 errors, should be excluded): {top_error_services(entries, 5)}"
+    top_5 = top_error_services(entries, 5)
+    assert top_5 == ["payment-service", "auth-service", "inventory-service"], (
+        f"unexpected top 5 (billing-service has 0 errors, should be excluded): {top_5}"
+    )
 
     print("All checks passed.")
     print(f"Error rates: {rates}")

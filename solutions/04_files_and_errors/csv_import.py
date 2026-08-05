@@ -3,7 +3,9 @@
 import csv
 from pathlib import Path
 
-DATA_PATH = Path(__file__).parent.parent.parent / "exercises" / "04_files_and_errors" / "data" / "sales.csv"
+DATA_PATH = (
+    Path(__file__).parent.parent.parent / "exercises" / "04_files_and_errors" / "data" / "sales.csv"
+)
 
 
 def load_sales(path: Path) -> tuple[list[dict], list[str]]:
