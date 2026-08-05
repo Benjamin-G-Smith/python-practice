@@ -73,22 +73,15 @@ def positive_rate_by_category(reviews: list[dict]) -> dict[str, float]:
     seeing this category."
     """
     categoryCounts = count_by_category(reviews)
-    percentPositive = {}
     positiveCounts = {}
     for review in reviews:
         if review["rating"] >= 4:
             positiveCounts[review["category"]] = positiveCounts.get(review["category"], 0 ) + 1
 
 
-    for category in categoryCounts.keys():
-        if category not in positiveCounts:
-            percentPositive[category] = 0.0
-        else:
-            percent = round((positiveCounts[category] / categoryCounts[category]),2)
-            percentPositive[category] = percentPositive.get(category, 0 ) + percent
-
-
+    percentPositive = { category: round((positiveCounts.get(category, 0) / categoryCounts[category]),2) for category in categoryCounts }
     return percentPositive
+
 
 
 def top_category(reviews: list[dict]) -> str:
@@ -101,15 +94,6 @@ def top_category(reviews: list[dict]) -> str:
     categoryCounts = count_by_category(reviews)
     topReview = max(categoryCounts,key=lambda k: ( categoryCounts[k], k))
 
-
-    # alternative 
-    # highest_seen = 0
-    # topReview = ""
-    # for category in categoryCounts:
-    #     if categoryCounts[category] > highest_seen:
-    #         highest_seen = categoryCounts[category]
-    #         topReview = category
-    
     return topReview
 
 
