@@ -57,7 +57,12 @@ def stream_entries(raw_lines):
 
     TODO: implement this function.
     """
-    raise NotImplementedError
+    for line in raw_lines:
+        parsed = parse_line(line)
+        if parsed is not None:
+            yield parsed
+
+    return 
 
 
 def filter_by_level(stream, level: str):
@@ -70,8 +75,11 @@ def filter_by_level(stream, level: str):
 
     TODO: implement this function.
     """
-    raise NotImplementedError
 
+    for entry in stream:
+        if entry["level"] == level:
+            yield entry
+    return 
 
 def take(stream, n: int) -> list:
     """
@@ -83,7 +91,16 @@ def take(stream, n: int) -> list:
 
     TODO: implement this function.
     """
-    raise NotImplementedError
+    items = []
+    count = 0
+
+    for entry in stream:
+        if count == n:
+            return items
+        else:
+            items.append(entry)
+            count += 1
+    return []
 
 
 def _self_check() -> None:
