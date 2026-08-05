@@ -67,6 +67,13 @@ must follow exactly:
   descriptive failure messages, called under `if __name__ == "__main__":`.
 - A mirrored, fully-implemented version in `solutions/<same relative path>`.
 - Add a row to the exercise table in README.md.
+- If a function's docstring makes a claim about failure/edge-case
+  handling (e.g. "skips malformed input," "returns None if missing"),
+  the sample data and `_self_check()` must actually exercise that path,
+  not just the happy path. `lazy_log_stream.py` originally didn't (its
+  sample data had zero malformed lines despite `stream_entries`'
+  docstring promising to skip them), which let a real bug — yielding
+  `None` instead of skipping — pass self-check undetected.
 
 Prefer scenarios over algorithm-puzzle trivia: data cleaning, reporting,
 small CLIs, config/file processing, simple API-shaped data (lists of
@@ -138,19 +145,31 @@ knows where I left off and what I found hard.
       Also duplicated a counting loop (`error_by_service` vs.
       `error_rate_by_service`) instead of one shared helper. Full
       feedback logged in ember-vault Growth Areas.
-- [ ] 01_basics — review_aggregator: new, reinforcement exercise (via
-      refine-questions, 2026-07-31) targeting the recurring dict-counting
-      pattern from log_analytics head-on — new scenario (review stats by
-      category) but the same "two independent counters per key" shape
-      that caused the off-by-one, isolated from sorting/filtering this
-      time. Do this before lazy_log_stream. Not yet attempted.
-- [ ] 01_basics — lazy_log_stream: new, targets generators (`yield`),
-      lazy iteration, composing generators. Self-check proves real laziness
-      (counts how many raw lines get pulled to find the first 2 errors, and
-      fails if the implementation secretly materializes a full list). Built
-      as a prerequisite for projects/live_log_monitor. Originally created
-      under `02_data_structures/`; moved to `01_basics/` (own choice,
-      2026-07-31). Do review_aggregator first. Not yet attempted.
+- [x] 01_basics — review_aggregator: completed 2026-08-04 (commit 0fe85ca,
+      polish commit 0d2433b). `count_by_category` used `dict.get(key, 0) + 1`
+      first attempt, no hint — the counting idiom is internalized for a
+      single counter. `positive_rate_by_category` correctly kept total/
+      positive as two independent counters, generalizing the off-by-one
+      fix without a hint on that point. The recurring pattern narrowed
+      rather than vanished: the merge step (`categoryCounts`/
+      `positiveCounts` → result) still used manual `if/else` where
+      `.get()` fits, fixed after two follow-up drill reps done inline in
+      chat (dict-merge shape, not a formal exercise). Full detail in
+      ember-vault Growth Areas.
+- [x] 01_basics — lazy_log_stream: completed 2026-08-05 (commit d95583f).
+      First exposure to generators/`yield` in this repo; iterated through
+      a couple of analogies before landing on an accurate one (laziness =
+      deferred computation, separate from duck-typed iteration = works on
+      any iterable — initially conflated the two). `take` had two real
+      bugs (`stream[i]` indexing on a possibly-non-subscriptable stream,
+      `range(0, n-1)` off-by-one), fixed after hints. Self-check passed
+      including the laziness assertion, but a final implementation review
+      (not the self-check — see the "Creating new exercises" note above)
+      caught a real bug: `stream_entries` yielded `None` for malformed
+      lines instead of skipping them, invisible because `RAW_LOGS_LARGE`
+      had no malformed lines. Fixed after two attempts (first checked
+      `line is not None` — the wrong thing, since raw strings are never
+      `None`; second correctly checked `parse_line(line)`'s result).
 - [ ] 01_basics — rolling_error_window: new, targets
       `collections.deque(maxlen=...)` for a fixed-size sliding window, plus
       `enumerate`/max-with-key. Works on a flat single-service list — the
