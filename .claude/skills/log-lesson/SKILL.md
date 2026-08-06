@@ -59,6 +59,17 @@ so it isn't skipped and actually gets recorded. Look for things like:
   debugging (traced actual values instead of guessing), cleaning up
   after themselves unprompted, good edge-case instincts. Progress
   tracking needs the wins recorded too, not only the gaps.
+- Time and space complexity: name the actual Big-O of what they wrote
+  (per relevant function, not the whole file) and whether it's already
+  optimal for the problem. This is an explicit standing priority (user
+  is optimizing this practice for interview readiness) — always include
+  it, not just when a complexity issue happens to stand out. If there's
+  a genuine tradeoff in a choice they made (e.g. a data structure that
+  costs O(k) extra space vs. one that doesn't, an O(n) approach vs. an
+  O(n log n) one), name the tradeoff explicitly rather than assuming
+  they'll notice it. If their solution is already optimal, say so
+  plainly instead of inventing a nitpick — confirming optimality is
+  itself useful signal, not a gap to fill.
 
 Then separately, check for **conceptual** gaps — not the same thing as
 code style. A function can be correct, idiomatic, and self-check-green
@@ -83,7 +94,12 @@ This is a checkpoint, not a formality. Tell the user directly, in chat:
 
 - **Patterns to reinforce**: code-level habits from step 3, framed
   against history where relevant ("this is the third time X has come
-  up" / "this is resolved — didn't recur this time").
+  up" / "this is resolved — didn't recur this time"). Always include the
+  time/space complexity read from step 3 here — either state the actual
+  Big-O and confirm it's optimal, or ask the user a direct question
+  about their solution's complexity (e.g. "what's the time complexity of
+  this loop, and could it be tighter?") when there's a real tradeoff
+  worth them reasoning through rather than just being told.
 - **Where understanding might be incomplete**: the conceptual gaps from
   step 3, named plainly (what the idea actually is, not just that
   something was slightly off).
