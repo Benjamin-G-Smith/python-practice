@@ -10,7 +10,7 @@ is a working monitor you're satisfied with, not passing a fixed test.
 
 ## Scenario
 
-`log_analytics.py` (Part II, in `exercises/02_data_structures/`) produces
+`log_analytics.py` (Part II, in `exercises/01_basics/`) produces
 a batch report after the fact — you feed it a full list of log lines and
 it tells you what happened. Ops now wants something that watches lines
 **as they arrive** and raises an alert the moment a service's error rate

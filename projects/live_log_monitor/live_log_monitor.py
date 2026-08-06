@@ -4,7 +4,7 @@ Real-world scenario
 Ops wants a lightweight in-process monitor that watches a stream of log
 lines *as they arrive* and raises an alert the moment a service's rolling
 error rate crosses a threshold - instead of waiting for a full batch
-report like log_analytics.py (exercises/02_data_structures/) produces.
+report like log_analytics.py (exercises/01_basics/) produces.
 
 This is a project skeleton, not a scaffolded exercise: the signatures and
 docstrings below are a starting point, not a fixed contract. Change them

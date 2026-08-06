@@ -221,8 +221,13 @@ knows where I left off and what I found hard.
       streaming/stateful design has too much open architecture space for a
       fixed-contract self-check). Combines lazy_log_stream's generator skill
       with rolling_error_window's deque skill, extended to per-service
-      windows. Do lazy_log_stream and rolling_error_window first. Not yet
-      started.
+      windows. Both prerequisites now done (2026-08-06). refine-questions
+      run at this point deliberately didn't generate a new 01_basics
+      exercise: rolling_error_window.py's gaps were non-idiomatic style
+      (manual deque eviction instead of `maxlen=`, `range(len())` over
+      `enumerate`), not a conceptual miss, and this project already forces
+      rediscovering `deque(maxlen=...)` in a harder per-service form. Not
+      yet started.
 - [ ] 02_data_structures — inventory_manager
 - [ ] 03_functions — expense_report
 - [ ] 04_files_and_errors — csv_import
