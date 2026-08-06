@@ -196,13 +196,26 @@ knows where I left off and what I found hard.
       had no malformed lines. Fixed after two attempts (first checked
       `line is not None` — the wrong thing, since raw strings are never
       `None`; second correctly checked `parse_line(line)`'s result).
-- [ ] 01_basics — rolling_error_window: new, targets
-      `collections.deque(maxlen=...)` for a fixed-size sliding window, plus
-      `enumerate`/max-with-key. Works on a flat single-service list — the
-      per-service dict-of-deques version is deferred to the project. Built
-      as a prerequisite for projects/live_log_monitor. Originally created
-      under `02_data_structures/`; moved to `01_basics/` (own choice,
-      2026-07-31). Not yet attempted.
+- [x] 01_basics — rolling_error_window: completed 2026-08-06 (commit
+      52df390). `first_breach`/`max_window_rate` were clean. Real bug in
+      `rolling_error_rate`: reused the loop variable `entry` to also hold
+      the item popped off the deque, silently overwriting the current
+      entry being processed — rates flatlined once the window filled.
+      Correctly described the full algorithm in plain English before
+      finding the bug, then self-diagnosed it by tracing what `entry`
+      held at each line once prompted. First attempt (before the deque
+      rewrite) used two plain counters with `total = len(entries)` fixed
+      at the full list length instead of entries-seen-so-far — wrong
+      denominator, not a crash, caught by comparing printed output
+      against expected rates directly. New pattern: camelCase variable
+      naming recurring (also in `log_analytics.py`); wrote a manual
+      deque-eviction loop instead of `deque(maxlen=...)`, which the
+      docstring specifically suggested. Post-passing, explicitly asked
+      to make time/space complexity analysis a standing part of every
+      lesson review going forward (interview-prep priority) — added to
+      `log-lesson` SKILL.md steps 3-4; confirmed this solution is
+      already optimal (O(n) time, O(window_size) space) for a streaming
+      input. Full detail in ember-vault Growth Areas.
 - [ ] projects/live_log_monitor — Part III of the log-parsing thread, but as
       a lightly scaffolded project instead of an exercise (my call, since a
       streaming/stateful design has too much open architecture space for a
