@@ -41,7 +41,33 @@ def rolling_error_rate(entries: list[dict], window_size: int) -> list[float]:
 
     TODO: implement this function.
     """
-    raise NotImplementedError
+    # rates [ 0.0%, 0.0%, 0.33%, ]
+    # error_count_seen so far at index / index
+    #  [*1] 2  3  4 5 6 7 
+    #  [1, *2] 3  4 5 6 7
+    #  [1, 2, *3 ]4 5 6 7
+    #  [1, 2, 3, *4 ] 5 6 7
+    #  1, [2, 3, 4, *5] 6 7 
+    # the window grows to window size 
+    # the window moves along the list until the end
+
+    # rates [ error% seen in the window so far ] 
+    errorsInQueue = 0
+    windowQueue = deque()
+    rates = []
+
+    for entry in entries:
+        if len(windowQueue) == window_size:
+            oldEntry = windowQueue.popleft()
+            if oldEntry['level'] == 'ERROR':
+                errorsInQueue -= 1
+            
+        if entry['level'] == 'ERROR':
+            errorsInQueue += 1
+        
+        windowQueue.append(entry)
+        rates.append(round(errorsInQueue/len(windowQueue),2))
+    return rates
 
 
 def first_breach(rates: list[float], threshold: float) -> int | None:
@@ -51,7 +77,11 @@ def first_breach(rates: list[float], threshold: float) -> int | None:
 
     TODO: implement this function.
     """
-    raise NotImplementedError
+    for i in range(0, len(rates)):
+        if rates[i] >= threshold:
+            return i
+    return None
+
 
 
 def max_window_rate(entries: list[dict], window_size: int) -> tuple[int, float]:
@@ -62,7 +92,16 @@ def max_window_rate(entries: list[dict], window_size: int) -> tuple[int, float]:
 
     TODO: implement this function.
     """
-    raise NotImplementedError
+    rates = rolling_error_rate(entries,window_size)
+    maxSeen = 0.0
+    minIndex = 0 
+    for index in range(0, len(rates)):
+        if rates[index] > maxSeen:
+            maxSeen = rates[index]
+            minIndex = index
+    return (minIndex, maxSeen)
+
+
 
 
 # Known-correct rates, used to test first_breach independently of
