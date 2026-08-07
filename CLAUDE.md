@@ -143,6 +143,19 @@ open-ended design space, real I/O, or multiple reasonable architectures.
 `uv venv` + `ruff` (see pyproject.toml). No pytest — self-checks are
 plain asserts, run directly with `python <file>`.
 
+## Tooling
+
+`tools/practice_hub/` — a local web UI (file explorer, editor with
+syntax highlighting, terminal, and a button that shells out to
+`claude -p` to invoke refine-questions for real) over this repo. Run
+with `python tools/practice_hub/server.py`, then open
+http://localhost:8787. It's meta-tooling, not a lesson — exempt from
+the exercises/projects conventions above (no TODO/self-check format, no
+solutions/ entry, no README exercise-table row). See
+`tools/practice_hub/README.md` for what's wired to the real repo vs.
+still sample data, and the permission-mode caveat on the
+refine-questions button before using it repeatedly.
+
 ## Progress notes
 
 Keep this section current as exercises get finished, so a future session

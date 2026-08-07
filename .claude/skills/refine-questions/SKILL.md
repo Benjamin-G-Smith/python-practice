@@ -25,7 +25,36 @@ one first, then decide whether to reinforce or escalate, then build it.
 - Check the "Progress notes" section in `CLAUDE.md` for anything logged
   about this topic before.
 
-## 2. Decide the next exercise
+## 2. Check for a due retest or interleave opportunity
+
+Before deciding reinforce/idiom/escalate below, check two things that
+decision doesn't cover on its own — both are about long-term retention,
+not just this one exercise:
+
+- **Cold retest.** Read the vault's `## Growth Areas` -> `Resolved`
+  section (`~/Documents/ember-vault/projects/python-practice.md`). If a
+  resolved pattern hasn't shown up in a scenario in the last 5
+  exercises (cross-check against `CLAUDE.md` Progress notes for how
+  recently it last appeared), work it into this exercise's sample data
+  or function contract naturally — don't flag it as "testing if you
+  remember X," just let the scenario need it. A pattern that only holds
+  up when explicitly cued isn't actually internalized; testing it cold
+  is the only way to know.
+- **Interleave, don't just escalate linearly.** If the last several
+  Progress notes entries are all the same topic folder, prefer a
+  scenario that also touches an earlier topic's skill even when step 3
+  below lands on "escalate" — e.g. a files exercise that also requires
+  a dict-counting pattern from `01_basics`. This is separate from the
+  "combine with an earlier skill" escalation guidance in step 3 — that's
+  about vertical difficulty, this is about not letting older skills go
+  stale from disuse. Mixing old and new beats a strictly linear topic
+  order for retention.
+
+Neither of these should turn into a second exercise or add visible
+ceremony — they're a lens on the one exercise step 3 decides to build,
+not an extra deliverable.
+
+## 3. Decide the next exercise
 
 Pick one, in this priority order:
 
@@ -45,7 +74,7 @@ Pick one, in this priority order:
 Only escalate one step at a time. Don't jump two topics ahead because one
 exercise went well.
 
-## 3. Build it
+## 4. Build it
 
 Follow the exact format described in `CLAUDE.md` under "Creating new
 exercises": scenario docstring naming the skills it drills, sample data as
@@ -100,13 +129,23 @@ If the new exercise is a straightforward escalation appended after
 everything else (the common case), it just gets the next letter/number
 in sequence — no reordering needed.
 
-## 4. Hand it over
+## 5. Hand it over
 
-Tell the user in one or two sentences what this exercise reinforces or
-escalates and why — not a lecture, just enough intent that they understand
-the point. Don't describe the solution approach; that's theirs to find.
+Before showing the exercise file, ask one retrieval question that makes
+the user commit to an approach before they see any code — e.g. "in one
+sentence, what's the core idea you'd reach for here?" or, for an
+escalation exercise, "what do you expect the time/space complexity to
+be?" This is a prediction, not a quiz — don't correct it yet, just get
+it stated. `log-lesson` compares it against what actually gets built
+when the lesson wraps up; a mismatch is a real signal even if the final
+code passes.
 
-## 5. Log it
+Then tell the user in one or two sentences what this exercise reinforces
+or escalates and why — not a lecture, just enough intent that they
+understand the point. Don't describe the solution approach; that's
+theirs to find.
+
+## 6. Log it
 
 Append a short line to the "Progress notes" section of `CLAUDE.md`: what
 was practiced, what went well or was shaky, and what the new exercise is

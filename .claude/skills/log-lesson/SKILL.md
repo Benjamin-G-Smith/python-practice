@@ -38,6 +38,15 @@ template:
   story, not "had some issues."
 - Idioms used, learned, or discussed (e.g. switched to `.get()`,
   discovered `maxsplit`, learned `deque(maxlen=...)`).
+- Hint latency: roughly how many hints/exchanges it took to get unstuck
+  on the main struggle this session, if there was one (e.g. "2 hints,
+  ~4 exchanges"). This is a trend signal, not a score - it is what lets
+  `## Growth Areas` show whether time-to-unstuck is shrinking for a
+  recurring pattern, not just whether the pattern still shows up at all.
+- If `refine-questions` asked a predict-first question when this
+  exercise was handed over (expected approach, expected time/space
+  complexity), what the user predicted - needed to compare against what
+  actually got built in step 3.
 
 Keep it dense — bullet points, scannable in 30 seconds. This mirrors the
 vault's own session-entry guidelines (see
@@ -70,6 +79,14 @@ so it isn't skipped and actually gets recorded. Look for things like:
   they'll notice it. If their solution is already optimal, say so
   plainly instead of inventing a nitpick — confirming optimality is
   itself useful signal, not a gap to fill.
+- Self-check coverage: skim the edge cases the `_self_check()` actually
+  tests. If they're the same shapes as the last couple of exercises
+  (empty input, one boundary, one tie) with nothing novel, that is a
+  sign the tally is becoming a comfortable ceiling rather than a real
+  bar - flag it and ask the user directly in step 4: "what's an edge
+  case you didn't test?" A genuine gap found this way gets added to the
+  exercise's `_self_check()` on the spot if the user wants, or noted in
+  the vault as a self-check blind spot if not.
 
 Then separately, check for **conceptual** gaps — not the same thing as
 code style. A function can be correct, idiomatic, and self-check-green
@@ -81,6 +98,11 @@ than reasoning (e.g. reused a tuple sort key without being able to say
 why the tiebreak works). Pull these from the actual conversation, not
 from re-reading the code alone — code review finds style issues,
 conceptual gaps mostly show up in how the user talked about the problem.
+If step 2 captured a predict-first answer, compare it to what actually
+got built: a prediction that didn't match (expected O(n), wrote O(n^2)
+without noticing; expected to need a helper, didn't realize duplication
+until it was pointed out) is itself a conceptual gap worth logging here,
+even when the final code passes and is otherwise clean.
 
 Read `~/Documents/ember-vault/projects/python-practice.md`'s existing
 `## Growth Areas` section (if the file exists) before finalizing either
@@ -102,7 +124,8 @@ This is a checkpoint, not a formality. Tell the user directly, in chat:
   worth them reasoning through rather than just being told.
 - **Where understanding might be incomplete**: the conceptual gaps from
   step 3, named plainly (what the idea actually is, not just that
-  something was slightly off).
+  something was slightly off) - including any predict-vs-actual mismatch
+  and any self-check coverage gap surfaced above.
 - **Genuine strengths**: don't skip these — an evaluation that's only
   gaps is a worse read of real progress than one that shows both.
 
@@ -176,7 +199,12 @@ Python (stdlib-only for exercises), uv + ruff, plain-assert self-checks
   (don't duplicate ones already listed).
 - Update `## Growth Areas` with the evaluation from steps 3-4 — code
   patterns *and* conceptual gaps, plus anything that came out of the
-  discussion in step 4 (a follow-up question, a correction, agreement):
+  discussion in step 4 (a follow-up question, a correction, agreement).
+  For a recurring pattern, append the hint-latency figure from step 2 so
+  the bullet reads as a trend, not a repeated flat statement (e.g.
+  "off-by-one under time pressure: 2 hints -> 1 hint -> 0 hints across
+  last 3 occurrences") — that's what actually answers "am I improving or
+  just finishing exercises":
   - This section tracks *recurring* patterns over time, not a per-session
     dump — it's what makes progress evaluable across sessions instead of
     feedback disappearing into a single chat.

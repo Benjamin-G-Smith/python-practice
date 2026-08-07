@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<title>python-practice — Practice Hub</title>
+<style>
+  :root {
+    --mono: "SF Mono", "Menlo", "Consolas", monospace;
+    --sans: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+  }
+  html[data-theme="dark"] {
+    --bg: #0f1115;
+    --panel: #161922;
+    --panel-2: #1c2029;
+    --editor-bg: #1a1d24;
+    --terminal-bg: #0b0d12;
+    --border: #262b38;
+    --text: #dfe3ea;
+    --text-dim: #8b93a7;
+    --text-dimmer: #5c6577;
+    --accent: #5ee6b8;
+    --accent-dim: rgba(94,230,184,.14);
+    --amber: #e6c35e;
+    --red: #e6705e;
+    --blue: #6ea8e6;
+    --purple: #c9a0ff;
+    --peach: #e69a6e;
+  }
+  html[data-theme="light"] {
+    --bg: #ffffff;
+    --panel: #f4f5f8;
+    --panel-2: #e8eaf0;
+    --editor-bg: #fbfbfc;
+    --terminal-bg: #eef0f4;
+    --border: #dde1e8;
+    --text: #1f2430;
+    --text-dim: #5b6472;
+    --text-dimmer: #8891a0;
+    --accent: #0f9d76;
+    --accent-dim: rgba(15,157,118,.12);
+    --amber: #a6790a;
+    --red: #c9463c;
+    --blue: #2560a8;
+    --purple: #7c4dbd;
+    --peach: #a3580a;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 14px; transition: background .15s, color .15s; }
+  code, .mono { font-family: var(--mono); }
+  #app { display: flex; height: 100vh; overflow: hidden; }
+
+  #activity-bar { width: 52px; flex-shrink: 0; background: var(--panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; padding-top: 12px; padding-bottom: 10px; gap: 3px; }
+  .act-btn { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 8px; color: var(--text-dimmer); cursor: pointer; position: relative; flex-shrink: 0; }
+  .act-btn svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+  .act-btn:hover { color: var(--text); background: var(--panel-2); }
+  .act-btn.active { color: var(--accent); }
+  .act-btn.active::before { content: ""; position: absolute; left: -12px; top: 8px; bottom: 8px; width: 3px; background: var(--accent); border-radius: 2px; }
+  #theme-toggle { margin-top: auto; }
+  #theme-toggle .icon-sun { display: none; }
+  html[data-theme="light"] #theme-toggle .icon-sun { display: block; }
+  html[data-theme="light"] #theme-toggle .icon-moon { display: none; }
+
+  #workspace { flex: 1; min-width: 0; position: relative; }
+  .view-pane { display: none; height: 100%; }
+  .view-pane.active { display: block; overflow-y: auto; }
+  #pane-lessons.active { display: flex; overflow: hidden; }
+  .scroll-inner { max-width: 980px; margin: 0 auto; padding: 26px 34px 60px 34px; }
+
+  h1 { font-size: 18px; margin: 0 0 4px 0; font-weight: 600; }
+  .subtitle { color: var(--text-dim); font-size: 12.5px; margin-bottom: 20px; }
+  h2.section { font-size: 11.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--text-dimmer); margin: 26px 0 10px 0; font-weight: 700; }
+  h2.section:first-of-type { margin-top: 0; }
+
+  .card { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 15px 17px; }
+  .grid { display: grid; gap: 11px; }
+  .grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
+  .stat-card .num { font-size: 24px; font-weight: 700; font-family: var(--mono); }
+  .stat-card .label { color: var(--text-dim); font-size: 11.5px; margin-top: 2px; }
+  .stat-card .sub { color: var(--text-dimmer); font-size: 10.5px; margin-top: 6px; }
+
+  .pill { display: inline-block; font-size: 10px; padding: 2px 7px; border-radius: 20px; font-weight: 700; letter-spacing: .02em; }
+  .pill.green { background: var(--accent-dim); color: var(--accent); }
+  .pill.amber { background: rgba(230,195,94,.16); color: var(--amber); }
+  .pill.red { background: rgba(230,112,94,.16); color: var(--red); }
+  .pill.blue { background: rgba(110,168,230,.16); color: var(--blue); }
+  .pill.gray { background: var(--panel-2); color: var(--text-dimmer); }
+  html[data-theme="light"] .pill.amber { background: rgba(166,121,10,.12); }
+  html[data-theme="light"] .pill.red { background: rgba(201,70,60,.12); }
+  html[data-theme="light"] .pill.blue { background: rgba(37,96,168,.12); }
+
+  .callout { border: 1px solid var(--border); border-left: 3px solid var(--accent); background: var(--panel); border-radius: 8px; padding: 11px 13px; font-size: 12.5px; color: var(--text-dim); margin-bottom: 9px; line-height: 1.55; }
+  .callout.warn { border-left-color: var(--amber); }
+  .callout b { color: var(--text); }
+  .callout .tag { font-family: var(--mono); font-size: 10.3px; color: var(--text-dimmer); display: block; margin-bottom: 4px; }
+
+  .ga-columns { display: grid; grid-template-columns: repeat(4, 1fr); gap: 11px; align-items: start; }
+  .ga-col h3 { font-size: 11.5px; margin: 0 0 8px 0; display: flex; align-items: center; gap: 6px; }
+  .ga-item { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 10px 11px; margin-bottom: 8px; font-size: 12px; line-height: 1.5; }
+  .ga-item .src { color: var(--text-dimmer); font-family: var(--mono); font-size: 10.2px; margin-top: 5px; }
+  .trend { font-family: var(--mono); font-size: 10.7px; color: var(--text-dim); margin-top: 5px; }
+  .trend .step { color: var(--text-dimmer); }
+  .trend .step.good { color: var(--accent); }
+
+  #flash-wrap { display: flex; flex-direction: column; align-items: center; padding: 6px 0 0 0; }
+  .flashcard { width: 100%; max-width: 540px; min-height: 200px; background: var(--panel); border: 1px solid var(--border); border-radius: 14px; display: flex; align-items: center; justify-content: center; text-align: center; padding: 28px; cursor: pointer; position: relative; }
+  .flashcard .face-tag { position: absolute; top: 12px; left: 14px; font-family: var(--mono); font-size: 10.3px; color: var(--text-dimmer); }
+  .flashcard .q { font-size: 15.5px; line-height: 1.5; }
+  .flashcard .a { font-size: 14px; line-height: 1.6; color: var(--accent); }
+  .flashcard .hint { position: absolute; bottom: 12px; font-size: 10.8px; color: var(--text-dimmer); }
+  .rate-row { display: flex; gap: 8px; margin-top: 14px; width: 100%; max-width: 540px; }
+  .rate-btn { flex: 1; padding: 9px 0; border-radius: 8px; border: 1px solid var(--border); background: var(--panel-2); color: var(--text); font-size: 12px; cursor: pointer; font-family: var(--sans); }
+  .rate-btn:hover { border-color: var(--text-dim); }
+  .rate-btn.again { color: var(--red); }
+  .rate-btn.hard { color: var(--amber); }
+  .rate-btn.good { color: var(--blue); }
+  .rate-btn.easy { color: var(--accent); }
+  .deck-meta { display: flex; justify-content: space-between; width: 100%; max-width: 540px; margin-bottom: 10px; font-size: 11px; color: var(--text-dim); font-family: var(--mono); }
+
+  .tl { position: relative; padding-left: 22px; }
+  .tl::before { content: ""; position: absolute; left: 6px; top: 4px; bottom: 4px; width: 1px; background: var(--border); }
+  .tl-item { position: relative; margin-bottom: 17px; }
+  .tl-item::before { content: ""; position: absolute; left: -22px; top: 4px; width: 9px; height: 9px; border-radius: 50%; background: var(--accent); border: 2px solid var(--bg); }
+  .tl-item .when { font-family: var(--mono); font-size: 10.7px; color: var(--text-dimmer); }
+  .tl-item .title { font-size: 13px; font-weight: 700; margin: 2px 0 5px 0; }
+  .tl-item .body { font-size: 12px; color: var(--text-dim); line-height: 1.6; }
+  .tl-item .commit { font-family: var(--mono); font-size: 10.5px; color: var(--text-dimmer); margin-top: 5px; }
+
+  .explorer { width: 240px; flex-shrink: 0; background: var(--panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: relative; }
+  .explorer-header { padding: 12px 14px 8px; font-size: 10.3px; letter-spacing: .08em; color: var(--text-dimmer); font-weight: 700; text-transform: uppercase; }
+  .tree { flex: 1; overflow-y: auto; padding: 2px 8px 10px 8px; }
+  .tree-row { display: flex; align-items: center; gap: 6px; padding: 4px 7px; border-radius: 5px; cursor: pointer; font-size: 12.3px; color: var(--text-dim); white-space: nowrap; }
+  .tree-row:hover { background: var(--panel-2); color: var(--text); }
+  .tree-row.folder { font-weight: 600; }
+  .tree-row.active-file { background: var(--accent-dim); color: var(--accent); }
+  .tree-row .chevron { width: 9px; flex-shrink: 0; color: var(--text-dimmer); transition: transform .12s; display: inline-block; }
+  .tree-row.folder.collapsed .chevron { transform: rotate(-90deg); }
+  .tree-row .flabel { overflow: hidden; text-overflow: ellipsis; }
+  .tree-children { margin-left: 13px; border-left: 1px solid var(--border); padding-left: 6px; }
+  .tree-children.collapsed { display: none; }
+  .status-dot { margin-left: auto; width: 6.5px; height: 6.5px; border-radius: 50%; flex-shrink: 0; }
+  .status-dot.done { background: var(--accent); }
+  .status-dot.progress { background: var(--amber); }
+  .status-dot.todo { background: transparent; border: 1.4px solid var(--text-dimmer); }
+  .status-check { margin-left: auto; color: var(--accent); font-size: 11px; flex-shrink: 0; }
+  .lock-icon { margin-left: auto; color: var(--text-dimmer); flex-shrink: 0; }
+  .lock-icon svg { width: 11px; height: 11px; fill: none; stroke: currentColor; stroke-width: 1.6; }
+  .tree-row.dim-file { color: var(--text-dimmer); cursor: default; }
+  .tree-row.dim-file:hover { background: none; color: var(--text-dimmer); }
+
+  .toast { position: absolute; bottom: 12px; left: 10px; right: 10px; background: var(--panel-2); border: 1px solid var(--border); border-left: 3px solid var(--amber); border-radius: 8px; padding: 9px 11px; font-size: 11.3px; color: var(--text-dim); line-height: 1.5; opacity: 0; transform: translateY(6px); transition: .18s; pointer-events: none; z-index: 10; }
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  .rq-btn { margin: 8px 10px 10px 10px; padding: 8px 10px; background: var(--accent-dim); border: 1px solid var(--accent); color: var(--accent); border-radius: 7px; font-size: 11.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; font-family: var(--sans); }
+  .rq-btn svg { width: 12px; height: 12px; fill: currentColor; stroke: none; flex-shrink: 0; }
+  .rq-btn:hover:not(:disabled) { background: var(--accent); color: var(--editor-bg); }
+  html[data-theme="light"] .rq-btn:hover:not(:disabled) { color: #fff; }
+  .rq-btn:disabled { opacity: .55; cursor: default; }
+
+  .rq-overlay { position: absolute; inset: 0; background: var(--panel); z-index: 6; display: none; flex-direction: column; padding: 16px 15px; gap: 11px; }
+  .rq-overlay.show { display: flex; }
+  .rq-overlay-title { font-family: var(--mono); font-size: 10.5px; color: var(--text-dimmer); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 2px; }
+  .rq-step { display: flex; align-items: flex-start; gap: 9px; font-size: 12px; color: var(--text-dimmer); line-height: 1.45; }
+  .rq-step.active { color: var(--text); }
+  .rq-step.done { color: var(--text-dim); }
+  .rq-dot { width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid var(--border); flex-shrink: 0; display: flex; align-items: center; justify-content: center; margin-top: 1px; position: relative; }
+  .rq-step.active .rq-dot { border-color: var(--accent); }
+  .rq-step.active .rq-dot::after { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: rq-pulse 1s infinite; }
+  .rq-step.done .rq-dot { border-color: var(--accent); background: var(--accent); }
+  .rq-step.done .rq-dot::after { content: '✓'; color: var(--editor-bg); font-size: 9px; font-weight: 700; }
+  @keyframes rq-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .3; } }
+  .rq-note { font-size: 11px; color: var(--text-dimmer); margin-top: auto; padding-top: 10px; border-top: 1px solid var(--border); line-height: 1.5; }
+  .rq-result { display: none; flex-direction: column; gap: 8px; height: 100%; }
+  .rq-result.show { display: flex; }
+  .rq-result pre { flex: 1; overflow-y: auto; background: var(--terminal-bg); border: 1px solid var(--border); border-radius: 7px; padding: 10px; font-family: var(--mono); font-size: 11px; line-height: 1.6; white-space: pre-wrap; color: var(--text-dim); margin: 0; }
+
+  .editor-col { flex: 1; min-width: 0; display: flex; flex-direction: column; background: var(--editor-bg); }
+  .tabbar { display: flex; background: var(--panel); border-bottom: 1px solid var(--border); flex-shrink: 0; overflow-x: auto; }
+  .tab { display: flex; align-items: center; gap: 7px; padding: 8px 12px; font-size: 12px; color: var(--text-dim); border-right: 1px solid var(--border); cursor: pointer; white-space: nowrap; }
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--text); background: var(--editor-bg); }
+  .tab-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .tab-dot.done { background: var(--accent); }
+  .tab-dot.progress { background: var(--amber); }
+  .tab-dot.todo { border: 1.4px solid var(--text-dimmer); }
+  .tab-close { color: var(--text-dimmer); font-size: 13px; margin-left: 2px; padding: 0 2px; border-radius: 3px; }
+  .tab-close:hover { color: var(--red); }
+  .tab-empty-state { display: flex; align-items: center; justify-content: center; height: 100%; color: var(--text-dimmer); font-size: 12.5px; }
+
+  .editor-area { flex: 1; min-height: 0; display: flex; overflow: hidden; }
+  .gutter { width: 42px; flex-shrink: 0; background: var(--editor-bg); color: var(--text-dimmer); font-family: var(--mono); font-size: 12px; line-height: 19px; text-align: right; padding: 12px 8px 12px 0; user-select: none; overflow: hidden; border-right: 1px solid var(--border); }
+  .code-wrap { position: relative; flex: 1; min-width: 0; overflow: hidden; }
+  .highlight-pre { position: absolute; inset: 0; margin: 0; padding: 12px 16px; font-family: var(--mono); font-size: 12px; line-height: 19px; white-space: pre; overflow: auto; pointer-events: none; color: var(--text); background: transparent; tab-size: 4; }
+  .highlight-pre::-webkit-scrollbar { display: none; }
+  .code-editor { position: absolute; inset: 0; width: 100%; height: 100%; background: transparent; color: transparent; caret-color: var(--text); border: none; outline: none; resize: none; font-family: var(--mono); font-size: 12px; line-height: 19px; padding: 12px 16px; white-space: pre; overflow: auto; tab-size: 4; }
+  .code-editor::selection { background: var(--accent-dim); }
+  .tok-kw { color: var(--blue); }
+  .tok-str { color: var(--amber); }
+  .tok-com { color: var(--text-dimmer); font-style: italic; }
+  .tok-num { color: var(--purple); }
+  .tok-def { color: var(--accent); font-weight: 600; }
+  .tok-self, .tok-builtin { color: var(--peach); }
+
+  .predict-box { background: var(--panel); border-bottom: 1px solid var(--border); padding: 10px 16px; flex-shrink: 0; display: none; }
+  .predict-box.show { display: block; }
+  .predict-label { font-size: 11px; color: var(--text-dim); margin-bottom: 6px; }
+  .predict-label b { color: var(--amber); }
+  .predict-box textarea { width: 100%; background: var(--terminal-bg); border: 1px solid var(--border); border-radius: 7px; color: var(--text); font-size: 12.3px; padding: 8px 10px; font-family: var(--sans); resize: none; min-height: 40px; }
+  .btn-small { margin-top: 7px; background: var(--accent); color: var(--editor-bg); border: none; padding: 6px 13px; border-radius: 6px; font-weight: 700; font-size: 11.5px; cursor: pointer; }
+  html[data-theme="light"] .btn-small { color: #fff; }
+  .predict-locked { font-size: 12px; color: var(--text-dim); line-height: 1.5; }
+  .predict-locked .pill { margin-right: 6px; }
+
+  .term-divider { display: flex; align-items: center; justify-content: space-between; padding: 6px 14px; background: var(--panel); border-top: 1px solid var(--border); font-size: 10.3px; letter-spacing: .06em; color: var(--text-dimmer); text-transform: uppercase; font-weight: 700; flex-shrink: 0; }
+  .run-btn { background: var(--panel-2); border: 1px solid var(--border); color: var(--text-dim); font-size: 11px; padding: 4px 11px; border-radius: 6px; cursor: pointer; font-family: var(--sans); text-transform: none; letter-spacing: 0; font-weight: 600; }
+  .run-btn:hover { color: var(--accent); border-color: var(--accent-dim); }
+  .run-btn:disabled { opacity: .5; cursor: default; }
+  .terminal { height: 210px; flex-shrink: 0; overflow-y: auto; background: var(--terminal-bg); padding: 10px 14px; font-family: var(--mono); font-size: 11.7px; line-height: 1.7; }
+  .term-line { white-space: pre-wrap; color: var(--text-dim); }
+  .term-line.dim { color: var(--text-dimmer); }
+  .term-line.ok { color: var(--accent); }
+  .term-line.bold-ok { color: var(--accent); font-weight: 700; }
+  .term-line.err { color: var(--red); }
+  .term-line.bold-err { color: var(--red); font-weight: 700; }
+
+  .chat-col { width: 290px; flex-shrink: 0; border-left: 1px solid var(--border); display: flex; flex-direction: column; background: var(--panel); }
+  .chat-header { padding: 12px 14px; border-bottom: 1px solid var(--border); font-size: 12px; font-weight: 700; flex-shrink: 0; }
+  .chat-sub { display: block; font-weight: 400; color: var(--text-dimmer); font-size: 10.2px; margin-top: 2px; }
+  .chat-messages { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 9px; }
+  .msg { max-width: 90%; font-size: 12px; line-height: 1.5; padding: 8px 10px; border-radius: 10px; }
+  .msg.user { align-self: flex-end; background: var(--accent-dim); color: var(--text); border: 1px solid var(--accent-dim); border-bottom-right-radius: 3px; }
+  .msg.ai { align-self: flex-start; background: var(--panel-2); border: 1px solid var(--border); border-bottom-left-radius: 3px; color: var(--text-dim); }
+  .msg.ai b { color: var(--text); }
+  .chat-empty-state { margin: auto; color: var(--text-dimmer); font-size: 11.5px; text-align: center; padding: 20px; line-height: 1.5; }
+  .chat-input-row { display: flex; gap: 6px; padding: 10px; border-top: 1px solid var(--border); flex-shrink: 0; }
+  .chat-input-row textarea { flex: 1; min-height: 34px; max-height: 80px; background: var(--terminal-bg); border: 1px solid var(--border); border-radius: 7px; color: var(--text); font-size: 12px; padding: 7px 9px; resize: none; font-family: var(--sans); }
+  .chat-input-row button { background: var(--accent); border: none; border-radius: 7px; color: var(--editor-bg); padding: 0 13px; font-weight: 700; font-size: 11.5px; cursor: pointer; }
+  html[data-theme="light"] .chat-input-row button { color: #fff; }
+
+  ::-webkit-scrollbar { width: 9px; height: 9px; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 5px; }
+</style>
+</head>
+<body>
+
+<div id="app">
+  <div id="activity-bar">
+    <div class="act-btn active" data-pane="lessons" title="Lessons">
+      <svg viewBox="0 0 24 24"><path d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M14 3v5h5"/><path d="M9.5 13.5 8 15l1.5 1.5"/><path d="M14.5 13.5 16 15l-1.5 1.5"/></svg>
+    </div>
+    <div class="act-btn" data-pane="growth" title="Growth Areas">
+      <svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 6h6v6"/></svg>
+    </div>
+    <div class="act-btn" data-pane="flash" title="Flashcards">
+      <svg viewBox="0 0 24 24"><rect x="5" y="7" width="14" height="10" rx="2"/><path d="M8 4h11a2 2 0 0 1 2 2v9"/></svg>
+    </div>
+    <div class="act-btn" data-pane="dashboard" title="Dashboard">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/></svg>
+    </div>
+    <div class="act-btn" data-pane="sessions" title="Sessions">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>
+    </div>
+    <div class="act-btn" id="theme-toggle" title="Toggle light / dark">
+      <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      <svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+    </div>
+  </div>
+
+  <div id="workspace">
+
+    <div class="view-pane active" id="pane-lessons">
+      <div class="explorer">
+        <div class="explorer-header">Explorer — live from disk</div>
+        <button class="rq-btn" id="rq-btn" onclick="runRefineQuestions()">
+          <svg viewBox="0 0 24 24"><path d="M6 4l14 8-14 8V4z"/></svg>
+          Run refine-questions
+        </button>
+        <div class="rq-overlay" id="rq-overlay">
+          <div class="rq-steps-wrap" id="rq-steps-wrap">
+            <div class="rq-overlay-title">refine-questions</div>
+            <div class="rq-step"><span class="rq-dot"></span>Gather signal — last exercise, hints, idioms used</div>
+            <div class="rq-step"><span class="rq-dot"></span>Check for a due retest or interleave</div>
+            <div class="rq-step"><span class="rq-dot"></span>Decide: reinforce, idiom, or escalate</div>
+            <div class="rq-step"><span class="rq-dot"></span>Build the exercise + verify it</div>
+            <div class="rq-step"><span class="rq-dot"></span>Hand over with a predict-first question</div>
+            <div class="rq-note" id="rq-note">Running <code class="mono">claude --dangerously-skip-permissions -p "..."</code> for real — this can take a minute or two.</div>
+          </div>
+          <div class="rq-result" id="rq-result">
+            <div class="rq-overlay-title">refine-questions — output</div>
+            <pre id="rq-result-text"></pre>
+            <button class="run-btn" onclick="dismissRQResult()">Close</button>
+          </div>
+        </div>
+        <div class="tree" id="tree"></div>
+        <div class="toast" id="toast"></div>
+      </div>
+
+      <div class="editor-col">
+        <div class="tabbar" id="tabbar"></div>
+
+        <div class="editor-area" id="editor-area">
+          <div class="tab-empty-state" id="tab-empty-state">Click a file in the explorer to open it.</div>
+          <div class="predict-box" id="predict-box" style="display:none;">
+            <div class="predict-label"><b>Before you code — refine-questions asks this at hand-over:</b> predict your approach.</div>
+            <textarea id="predict-input" placeholder="In one sentence: what's your approach, and what's the expected time/space complexity?"></textarea>
+            <button class="btn-small" onclick="lockPrediction()">Lock in prediction</button>
+            <div class="predict-locked" id="predict-locked" style="display:none;">
+              <span class="pill green">locked</span><span id="predict-locked-text"></span> — compared against what you actually build when this lesson gets logged.
+            </div>
+          </div>
+          <div class="editor-scroll" id="editor-scroll" style="display:none; flex:1; min-height:0; display:flex; overflow:hidden;">
+            <div class="gutter" id="gutter"></div>
+            <div class="code-wrap">
+              <pre class="highlight-pre" id="hl"><code></code></pre>
+              <textarea class="code-editor" id="code-editor" spellcheck="false"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="term-divider"><span>Terminal</span><button class="run-btn" id="run-btn" onclick="runActive()" disabled>▶ Run</button></div>
+        <div class="terminal" id="terminal">
+          <div class="term-line dim">Open a file, then click Run — this executes <code class="mono">python &lt;file&gt;</code> for real and shows the actual output.</div>
+        </div>
+      </div>
+
+      <div class="chat-col">
+        <div class="chat-header">Ask about this file<span class="chat-sub">Still mocked in this phase — no live model wired to chat yet.</span></div>
+        <div class="chat-messages" id="chat-messages">
+          <div class="chat-empty-state">Open a file to see this.</div>
+        </div>
+        <div class="chat-input-row">
+          <textarea id="chat-input" placeholder="Ask a question about this file..." rows="1"></textarea>
+          <button onclick="sendChat()">Send</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="view-pane" id="pane-growth">
+      <div class="scroll-inner">
+        <h1>Growth Areas</h1>
+        <div class="subtitle">Sample data for now — real wiring to the vault (~/Documents/ember-vault/projects/python-practice.md) is a later phase. See tools/practice_hub/README.md.</div>
+        <div class="ga-columns">
+          <div class="ga-col">
+            <h3><span class="pill amber">Reinforce</span></h3>
+            <div class="ga-item"><b>camelCase</b> variable naming instead of <code class="mono">snake_case</code>.
+              <div class="trend">log_analytics <span class="step">(2 hints)</span> → rolling_error_window <span class="step good">(1 hint)</span></div>
+              <div class="src">seen again in rolling_error_window.py</div></div>
+            <div class="ga-item">Manual <code class="mono">deque</code> eviction loop instead of <code class="mono">deque(maxlen=...)</code>.
+              <div class="trend">rolling_error_window <span class="step">(new)</span></div>
+              <div class="src">flagged in log-lesson review, not yet retested</div></div>
+          </div>
+          <div class="ga-col">
+            <h3><span class="pill green">Resolved</span></h3>
+            <div class="ga-item"><code class="mono">dict.get(key, 0) + 1</code> counting idiom.
+              <div class="trend">log_analytics <span class="step">(hint)</span> → review_aggregator <span class="step good">(unprompted)</span></div>
+              <div class="src">didn't recur</div></div>
+          </div>
+          <div class="ga-col">
+            <h3><span class="pill blue">Strengths</span></h3>
+            <div class="ga-item">Systematic debugging — traces actual printed values instead of guessing.</div>
+            <div class="ga-item">Adds own edge-case assertions unprompted.</div>
+          </div>
+          <div class="ga-col">
+            <h3><span class="pill gray">Not a gap</span></h3>
+            <div class="ga-item"><code class="mono">itertools.islice</code> not used yet — stdlib tool not introduced. Not a miss.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="view-pane" id="pane-flash">
+      <div class="scroll-inner">
+        <h1>Flashcards</h1>
+        <div class="subtitle">Spaced retrieval on concepts from finished exercises.</div>
+        <div id="flash-wrap">
+          <div class="deck-meta"><span id="deck-pos">Card 1 / 6</span><span>sample deck</span></div>
+          <div class="flashcard" id="flashcard" onclick="flipCard()">
+            <span class="face-tag" id="face-tag">CONCEPT</span>
+            <div class="q" id="card-front"></div>
+            <div class="a" id="card-back" style="display:none;"></div>
+            <span class="hint">click to flip</span>
+          </div>
+          <div class="rate-row" id="rate-row" style="visibility:hidden;">
+            <button class="rate-btn again" onclick="rate()">Again</button>
+            <button class="rate-btn hard" onclick="rate()">Hard</button>
+            <button class="rate-btn good" onclick="rate()">Good</button>
+            <button class="rate-btn easy" onclick="rate()">Easy</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="view-pane" id="pane-dashboard">
+      <div class="scroll-inner">
+        <h1>Dashboard</h1>
+        <div class="subtitle">Sample signals — same later-phase note as Growth Areas.</div>
+        <div class="grid cols-4">
+          <div class="card stat-card"><div class="num" id="dash-exercises">—</div><div class="label">exercises passing right now</div><div class="sub">live from /api/tree</div></div>
+          <div class="card stat-card"><div class="num">3 → 2</div><div class="label">to-reinforce → resolved</div><div class="sub">sample</div></div>
+          <div class="card stat-card"><div class="num">0</div><div class="label">hints on last exercise</div><div class="sub">sample</div></div>
+          <div class="card stat-card"><div class="num" id="dash-updated">—</div><div class="label">tree last checked</div><div class="sub">this page load</div></div>
+        </div>
+        <h2 class="section">Next action</h2>
+        <div class="card" style="font-size:13px; color: var(--text-dim);">Open the Lessons tab and click <b style="color:var(--text)">Run refine-questions</b> — it invokes the real skill via the Claude Code CLI.</div>
+      </div>
+    </div>
+
+    <div class="view-pane" id="pane-sessions">
+      <div class="scroll-inner">
+        <h1>Sessions</h1>
+        <div class="subtitle">Sample data — real wiring reads the vault's session log. See tools/practice_hub/README.md.</div>
+        <div class="tl">
+          <div class="tl-item"><div class="when">most recent</div><div class="title">Check the Lessons tab</div><div class="body">This panel isn't wired to real session history yet — the file tree and terminal are.</div></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // ================= theme =================
+  (function initTheme() {
+    let saved = null;
+    try { saved = localStorage.getItem('practice-hub-theme'); } catch (e) {}
+    if (saved === 'light' || saved === 'dark') document.documentElement.setAttribute('data-theme', saved);
+  })();
+  document.getElementById('theme-toggle').addEventListener('click', () => {
+    const current = document.documentElement.getAttribute('data-theme') || 'dark';
+    const next = current === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    try { localStorage.setItem('practice-hub-theme', next); } catch (e) {}
+  });
+
+  // ================= activity bar nav =================
+  document.querySelectorAll('.act-btn[data-pane]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.act-btn[data-pane]').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.view-pane').forEach(v => v.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('pane-' + btn.dataset.pane).classList.add('active');
+    });
+  });
+
+  // ================= syntax highlighting =================
+  const KEYWORDS = new Set(['def','return','if','elif','else','for','while','in','import','from','as','class','raise','try','except','finally','with','yield','lambda','not','and','or','is','None','True','False','pass','break','continue','global','nonlocal','assert','del','async','await']);
+  const BUILTINS = new Set(['len','range','print','round','sum','max','min','sorted','enumerate','isinstance','dict','list','tuple','set','str','int','float','bool','zip','map','filter','open','type','super']);
+  const TOKEN_RE = /("""[\s\S]*?"""|'''[\s\S]*?'''|#[^\n]*|"(?:[^"\\\n]|\\.)*"|'(?:[^'\\\n]|\\.)*'|\b\d+\.?\d*\b|\b[A-Za-z_][A-Za-z0-9_]*\b)/g;
+
+  function escapeHtml(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+  function highlightPython(code) {
+    let result = '', lastIndex = 0, expectDefName = false, m;
+    TOKEN_RE.lastIndex = 0;
+    while ((m = TOKEN_RE.exec(code)) !== null) {
+      const tok = m[0], start = m.index;
+      if (start > lastIndex) result += escapeHtml(code.slice(lastIndex, start));
+      lastIndex = start + tok.length;
+      const first = tok[0];
+      if (first === '"' || first === "'") { result += '<span class="tok-str">' + escapeHtml(tok) + '</span>'; expectDefName = false; }
+      else if (first === '#') { result += '<span class="tok-com">' + escapeHtml(tok) + '</span>'; expectDefName = false; }
+      else if (/^\d/.test(tok)) { result += '<span class="tok-num">' + escapeHtml(tok) + '</span>'; expectDefName = false; }
+      else if (expectDefName) { result += '<span class="tok-def">' + escapeHtml(tok) + '</span>'; expectDefName = false; }
+      else if (KEYWORDS.has(tok)) { result += '<span class="tok-kw">' + escapeHtml(tok) + '</span>'; if (tok === 'def' || tok === 'class') expectDefName = true; }
+      else if (tok === 'self') { result += '<span class="tok-self">' + escapeHtml(tok) + '</span>'; }
+      else if (BUILTINS.has(tok)) { result += '<span class="tok-builtin">' + escapeHtml(tok) + '</span>'; }
+      else { result += escapeHtml(tok); }
+    }
+    result += escapeHtml(code.slice(lastIndex));
+    return result;
+  }
+
+  // ================= state =================
+  let treeData = null;
+  let tabs = [];          // [{path, name, status}]
+  let activePath = null;
+  const fileCache = {};       // path -> content
+  const terminalCache = {};   // path -> {stdout, stderr, returncode}
+  let knownPaths = new Set();
+  let newlyGenerated = new Set();
+
+  const MOCK_CHATS = {
+    'exercises/01_basics/rolling_error_window.py': [
+      ['user', 'is rolling_error_rate right? the rates flatten out once the window fills up'],
+      ['ai', 'Ran it — <b>rolling_error_rate: 2/6 passed</b>, and the failures start once the window is full. Look at your loop: are you reusing one variable name for both the item you\'re iterating and the value you pop off the window?'],
+      ['user', 'oh — entry gets overwritten by the popped one'],
+      ['ai', 'Exactly. Give the popped value its own name and re-run.'],
+    ],
+    'projects/live_log_monitor/live_log_monitor.py': [
+      ['user', 'how is this different from rolling_error_window\'s approach?'],
+      ['ai', 'Same sliding-window idea, but that exercise tracks one flat list. Here you need one window <i>per service</i> — think about what maps a service name to its own deque.'],
+      ['user', 'a dict of deques?'],
+      ['ai', 'That\'s the shape the README points at. Get rolling_error_rate printing per-entry rates before touching find_alerts.'],
+    ],
+  };
+
+  // ================= tree rendering =================
+  function makeFolderRow(label, expanded, badge) {
+    const row = document.createElement('div');
+    row.className = 'tree-row folder' + (expanded ? '' : ' collapsed');
+    row.innerHTML = '<span class="chevron">▾</span><span class="flabel"></span>';
+    row.querySelector('.flabel').textContent = label;
+    if (badge) {
+      const b = document.createElement('span');
+      b.className = 'status-check';
+      b.textContent = badge;
+      row.appendChild(b);
+    }
+    const children = document.createElement('div');
+    children.className = 'tree-children' + (expanded ? '' : ' collapsed');
+    row.addEventListener('click', () => { row.classList.toggle('collapsed'); children.classList.toggle('collapsed'); });
+    return { row, children };
+  }
+
+  function makeFileRow(f) {
+    const row = document.createElement('div');
+    row.className = 'tree-row';
+    row.dataset.path = f.path;
+    const label = document.createElement('span');
+    label.className = 'flabel';
+    label.textContent = f.name;
+    row.appendChild(label);
+    if (newlyGenerated.has(f.path)) {
+      const pill = document.createElement('span');
+      pill.className = 'pill amber';
+      pill.style.marginLeft = 'auto';
+      pill.textContent = 'new';
+      row.appendChild(pill);
+    } else if (f.status === 'done') {
+      const chk = document.createElement('span');
+      chk.className = 'status-check';
+      chk.textContent = '✓';
+      row.appendChild(chk);
+    } else {
+      const dot = document.createElement('span');
+      dot.className = 'status-dot ' + (f.status === 'progress' ? 'progress' : 'todo');
+      row.appendChild(dot);
+    }
+    if (f.path === activePath) row.classList.add('active-file');
+    row.addEventListener('click', () => openFile(f.path, f.name, f.status));
+    return row;
+  }
+
+  function renderTree() {
+    const container = document.getElementById('tree');
+    container.innerHTML = '';
+    if (!treeData) return;
+
+    const exRoot = makeFolderRow('exercises', true);
+    container.appendChild(exRoot.row);
+    container.appendChild(exRoot.children);
+    treeData.exercises.forEach(topic => {
+      const done = topic.files.filter(f => f.status === 'done').length;
+      const tf = makeFolderRow(topic.topic, true, done + '/' + topic.files.length);
+      exRoot.children.appendChild(tf.row);
+      exRoot.children.appendChild(tf.children);
+      topic.files.forEach(f => tf.children.appendChild(makeFileRow(f)));
+    });
+
+    if (treeData.projects.length) {
+      const projRoot = makeFolderRow('projects', true);
+      container.appendChild(projRoot.row);
+      container.appendChild(projRoot.children);
+      treeData.projects.forEach(proj => {
+        const pf = makeFolderRow(proj.project, true);
+        projRoot.children.appendChild(pf.row);
+        projRoot.children.appendChild(pf.children);
+        proj.files.forEach(f => pf.children.appendChild(makeFileRow(f)));
+      });
+    }
+
+    const solRow = document.createElement('div');
+    solRow.className = 'tree-row folder collapsed';
+    solRow.innerHTML = '<span class="chevron">▾</span><span class="flabel">solutions</span><span class="lock-icon"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span>';
+    solRow.addEventListener('click', (e) => {
+      e.stopPropagation();
+      showToast('solutions/ is the answer key — this UI never fetches it. Look at it yourself if you want it (per CLAUDE.md).');
+    });
+    container.appendChild(solRow);
+  }
+
+  async function loadTree() {
+    const res = await fetch('/api/tree');
+    treeData = await res.json();
+    renderTree();
+    return treeData;
+  }
+
+  function allFiles() {
+    const out = [];
+    treeData.exercises.forEach(t => t.files.forEach(f => out.push(f)));
+    treeData.projects.forEach(p => p.files.forEach(f => out.push(f)));
+    return out;
+  }
+
+  // ================= tabs + editor =================
+  function renderTabBar() {
+    const bar = document.getElementById('tabbar');
+    bar.innerHTML = '';
+    tabs.forEach(t => {
+      const el = document.createElement('div');
+      el.className = 'tab' + (t.path === activePath ? ' active' : '');
+      const dotClass = t.status === 'done' ? 'done' : t.status === 'progress' ? 'progress' : 'todo';
+      const dot = document.createElement('span');
+      dot.className = 'tab-dot ' + dotClass;
+      const label = document.createElement('span');
+      label.textContent = t.name;
+      const close = document.createElement('span');
+      close.className = 'tab-close';
+      close.textContent = '×';
+      close.addEventListener('click', (e) => { e.stopPropagation(); closeTab(t.path); });
+      el.appendChild(dot); el.appendChild(label); el.appendChild(close);
+      el.addEventListener('click', () => openFile(t.path, t.name, t.status));
+      bar.appendChild(el);
+    });
+  }
+
+  function closeTab(path) {
+    tabs = tabs.filter(t => t.path !== path);
+    renderTabBar();
+    if (activePath === path) {
+      if (tabs.length) {
+        const last = tabs[tabs.length - 1];
+        openFile(last.path, last.name, last.status);
+      } else {
+        activePath = null;
+        document.getElementById('editor-scroll').style.display = 'none';
+        document.getElementById('predict-box').classList.remove('show');
+        document.getElementById('tab-empty-state').style.display = 'flex';
+        document.getElementById('run-btn').disabled = true;
+        document.getElementById('terminal').innerHTML = '<div class="term-line dim">Open a file, then click Run.</div>';
+        renderChat(null);
+      }
+    }
+  }
+
+  async function openFile(path, name, status) {
+    if (!tabs.find(t => t.path === path)) tabs.push({ path, name, status });
+    activePath = path;
+    newlyGenerated.delete(path);
+    renderTabBar();
+    renderTree();
+    document.getElementById('tab-empty-state').style.display = 'none';
+    document.getElementById('editor-scroll').style.display = 'flex';
+    document.getElementById('run-btn').disabled = false;
+
+    if (fileCache[path] === undefined) {
+      const res = await fetch('/api/file?path=' + encodeURIComponent(path));
+      const data = await res.json();
+      fileCache[path] = data.content !== undefined ? data.content : ('# error loading file: ' + (data.error || 'unknown'));
+    }
+    document.getElementById('code-editor').value = fileCache[path];
+    buildGutter();
+    renderHighlight();
+
+    document.getElementById('predict-box').classList.toggle('show', status === 'todo');
+    document.getElementById('predict-input').value = '';
+    document.getElementById('predict-input').style.display = 'block';
+    document.querySelector('#predict-box button').style.display = 'inline-block';
+    document.getElementById('predict-locked').style.display = 'none';
+
+    renderChat(path);
+
+    if (terminalCache[path]) {
+      renderTerminal(terminalCache[path], path);
+    } else {
+      document.getElementById('terminal').innerHTML =
+        '<div class="term-line dim">$ python ' + escapeHtml(path) + '</div>' +
+        '<div class="term-line dim" style="margin-top:6px;">running…</div>';
+      runActive();
+    }
+  }
+
+  function buildGutter() {
+    const lines = document.getElementById('code-editor').value.split('\n').length;
+    let out = '';
+    for (let i = 1; i <= lines; i++) out += i + '\n';
+    document.getElementById('gutter').textContent = out;
+  }
+  function renderHighlight() {
+    const code = document.getElementById('code-editor').value;
+    document.getElementById('hl').querySelector('code').innerHTML = highlightPython(code) + '\n';
+  }
+  document.getElementById('code-editor').addEventListener('input', () => { buildGutter(); renderHighlight(); });
+  document.getElementById('code-editor').addEventListener('scroll', () => {
+    const ta = document.getElementById('code-editor');
+    document.getElementById('gutter').scrollTop = ta.scrollTop;
+    const hl = document.getElementById('hl');
+    hl.scrollTop = ta.scrollTop;
+    hl.scrollLeft = ta.scrollLeft;
+  });
+
+  function lockPrediction() {
+    const val = document.getElementById('predict-input').value.trim();
+    document.getElementById('predict-locked-text').textContent = val ? '"' + val + '"' : '(no prediction entered)';
+    document.getElementById('predict-input').style.display = 'none';
+    document.querySelector('#predict-box button').style.display = 'none';
+    document.getElementById('predict-locked').style.display = 'block';
+  }
+
+  // ================= terminal (real) =================
+  function renderTerminal(result, path) {
+    const term = document.getElementById('terminal');
+    let html = '<div class="term-line dim">$ python ' + escapeHtml(path) + '</div><div class="term-line">&nbsp;</div>';
+    const stdoutLines = (result.stdout || '').split('\n');
+    if (stdoutLines[stdoutLines.length - 1] === '') stdoutLines.pop();
+    stdoutLines.forEach(line => {
+      let cls = '';
+      const tally = line.match(/^(\S+): (\d+)\/(\d+) passed$/);
+      if (tally) cls = tally[2] === tally[3] ? 'ok' : 'err';
+      else if (line === 'All checks passed.') cls = 'bold-ok';
+      else if (line.startsWith('FAILED')) cls = 'err';
+      else if (line.trim() === '') cls = '';
+      else cls = 'dim';
+      html += '<div class="term-line ' + cls + '">' + (escapeHtml(line) || '&nbsp;') + '</div>';
+    });
+    if (result.stderr && result.stderr.trim()) {
+      html += '<div class="term-line">&nbsp;</div>';
+      result.stderr.split('\n').forEach(line => {
+        if (!line.trim()) return;
+        html += '<div class="term-line err">' + escapeHtml(line) + '</div>';
+      });
+    }
+    html += '<div class="term-line dim" style="margin-top:6px;">exit code ' + result.returncode + '</div>';
+    term.innerHTML = html;
+  }
+
+  async function runActive() {
+    if (!activePath) return;
+    const path = activePath;
+    const btn = document.getElementById('run-btn');
+    btn.disabled = true;
+    document.getElementById('terminal').innerHTML =
+      '<div class="term-line dim">$ python ' + escapeHtml(path) + '</div><div class="term-line dim" style="margin-top:6px;">running…</div>';
+    try {
+      const res = await fetch('/api/run', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ path }) });
+      const data = await res.json();
+      terminalCache[path] = data;
+      if (path === activePath) renderTerminal(data, path);
+      const t = tabs.find(t => t.path === path);
+      const newStatus = data.returncode === 0 ? 'done' : (path.startsWith('projects/') ? 'progress' : 'todo');
+      if (t) t.status = newStatus;
+      await loadTree();
+      renderTabBar();
+    } catch (e) {
+      document.getElementById('terminal').innerHTML = '<div class="term-line err">Could not reach the server: ' + escapeHtml(e.message) + '</div>';
+    }
+    btn.disabled = false;
+  }
+
+  // ================= chat (mocked, per file) =================
+  function renderChat(path) {
+    const container = document.getElementById('chat-messages');
+    container.innerHTML = '';
+    if (!path) {
+      container.innerHTML = '<div class="chat-empty-state">Open a file to see this.</div>';
+      return;
+    }
+    if (MOCK_CHATS[path]) {
+      MOCK_CHATS[path].forEach(([role, text]) => {
+        const el = document.createElement('div');
+        el.className = 'msg ' + role;
+        el.innerHTML = text;
+        container.appendChild(el);
+      });
+      return;
+    }
+    container.innerHTML = '<div class="chat-empty-state">No questions asked on this file yet — chat isn\'t wired to a live model in this phase. See tools/practice_hub/README.md.</div>';
+  }
+  function sendChat() {
+    const input = document.getElementById('chat-input');
+    const text = input.value.trim();
+    if (!text || !activePath) return;
+    const container = document.getElementById('chat-messages');
+    if (container.querySelector('.chat-empty-state')) container.innerHTML = '';
+    const el = document.createElement('div');
+    el.className = 'msg user';
+    el.textContent = text;
+    container.appendChild(el);
+    input.value = '';
+    container.scrollTop = container.scrollHeight;
+    setTimeout(() => {
+      const ai = document.createElement('div');
+      ai.className = 'msg ai';
+      ai.textContent = 'Chat isn\'t wired to a live model yet in this phase — the file tree, editor, and terminal are real, this box still isn\'t.';
+      container.appendChild(ai);
+      container.scrollTop = container.scrollHeight;
+    }, 400);
+  }
+  document.getElementById('chat-input').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChat(); }
+  });
+
+  // ================= toast =================
+  let toastTimer;
+  function showToast(msg) {
+    const toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 4200);
+  }
+
+  // ================= refine-questions (real) =================
+  function runRefineQuestions() {
+    const btn = document.getElementById('rq-btn');
+    const overlay = document.getElementById('rq-overlay');
+    const stepsWrap = document.getElementById('rq-steps-wrap');
+    const result = document.getElementById('rq-result');
+    result.classList.remove('show');
+    stepsWrap.style.display = 'flex';
+    stepsWrap.style.flexDirection = 'column';
+    stepsWrap.style.gap = '11px';
+    stepsWrap.style.height = '100%';
+    const steps = stepsWrap.querySelectorAll('.rq-step');
+    btn.disabled = true;
+    steps.forEach(s => s.classList.remove('active', 'done'));
+    overlay.classList.add('show');
+    let i = 0;
+    function tick() {
+      if (i > 0) { steps[i - 1].classList.remove('active'); steps[i - 1].classList.add('done'); }
+      if (i < steps.length - 1) {
+        steps[i].classList.add('active');
+        i++;
+        setTimeout(tick, 420);
+      } else {
+        steps[i].classList.add('active');  // "Hand over" pulses until the real response lands
+        callRefineQuestions();
+      }
+    }
+    tick();
+  }
+
+  async function callRefineQuestions() {
+    knownPaths = new Set(allFiles().map(f => f.path));
+    try {
+      const res = await fetch('/api/refine-questions', { method: 'POST' });
+      const data = await res.json();
+      document.getElementById('rq-btn').disabled = false;
+      if (data.error) {
+        document.getElementById('rq-overlay').classList.remove('show');
+        showToast('refine-questions failed: ' + data.error);
+        return;
+      }
+      treeData = data.tree;
+      const newPaths = allFiles().map(f => f.path).filter(p => !knownPaths.has(p));
+      newlyGenerated = new Set(newPaths);
+      renderTree();
+      showRQResult((data.stdout || '(no output)') + (data.stderr ? '\n\n--- stderr ---\n' + data.stderr : ''));
+      if (newPaths.length) {
+        const f = allFiles().find(f => f.path === newPaths[0]);
+        showToast('New file: ' + f.name + ' — opening it now.');
+      } else {
+        showToast('refine-questions finished — no new file detected, check its output.');
+      }
+    } catch (e) {
+      document.getElementById('rq-btn').disabled = false;
+      document.getElementById('rq-overlay').classList.remove('show');
+      showToast('Could not reach the server: ' + e.message);
+    }
+  }
+
+  function showRQResult(text) {
+    document.getElementById('rq-steps-wrap').style.display = 'none';
+    document.getElementById('rq-result-text').textContent = text;
+    document.getElementById('rq-result').classList.add('show');
+  }
+  function dismissRQResult() {
+    document.getElementById('rq-overlay').classList.remove('show');
+    const newPaths = Array.from(newlyGenerated);
+    if (newPaths.length) {
+      const f = allFiles().find(f => f.path === newPaths[0]);
+      if (f) openFile(f.path, f.name, f.status);
+    }
+  }
+
+  // ================= flashcards (unchanged, sample) =================
+  const deck = [
+    { tag: "CONCEPT", front: "Why does deque(maxlen=n) beat a manual pop-from-front eviction loop for a sliding window?", back: "list.pop(0) is O(n) — shifts every remaining element. deque.append() on a maxlen deque evicts the oldest item automatically in O(1)." },
+    { tag: "CONCEPT", front: "Core difference between a generator (yield) and a function that builds and returns a list?", back: "A generator computes lazily, O(1) memory regardless of stream length. A list-returning function computes eagerly, O(n) memory up front." },
+    { tag: "REFERENCE", front: "split(\"|\") vs split(\"|\", maxsplit=3) — why does it matter for a message field?", back: "Plain split() breaks on every delimiter, including ones inside the message. maxsplit caps the split count so the rest stays intact." },
+  ];
+  let idx = 0, flipped = false;
+  function renderCard() {
+    const c = deck[idx];
+    document.getElementById('face-tag').textContent = c.tag;
+    document.getElementById('card-front').textContent = c.front;
+    document.getElementById('card-back').textContent = c.back;
+    document.getElementById('card-front').style.display = 'block';
+    document.getElementById('card-back').style.display = 'none';
+    document.getElementById('rate-row').style.visibility = 'hidden';
+    document.getElementById('deck-pos').textContent = 'Card ' + (idx + 1) + ' / ' + deck.length;
+    flipped = false;
+  }
+  function flipCard() {
+    if (flipped) return;
+    document.getElementById('card-front').style.display = 'none';
+    document.getElementById('card-back').style.display = 'block';
+    document.getElementById('rate-row').style.visibility = 'visible';
+    flipped = true;
+  }
+  function rate() { idx = (idx + 1) % deck.length; renderCard(); }
+  renderCard();
+
+  // ================= init =================
+  async function init() {
+    await loadTree();
+    knownPaths = new Set(allFiles().map(f => f.path));
+    document.getElementById('dash-exercises').textContent =
+      allFiles().filter(f => f.status === 'done').length + '/' + treeData.exercises.reduce((n, t) => n + t.files.length, 0);
+    document.getElementById('dash-updated').textContent = new Date().toLocaleTimeString();
+
+    let newest = null;
+    treeData.exercises.forEach(t => t.files.forEach(f => { if (!newest || f.mtime > newest.mtime) newest = f; }));
+    const proj = treeData.projects[0] && treeData.projects[0].files[0];
+    if (proj) tabs.push({ path: proj.path, name: proj.name, status: proj.status });
+    if (newest) await openFile(newest.path, newest.name, newest.status);
+    else if (proj) await openFile(proj.path, proj.name, proj.status);
+    renderTabBar();
+  }
+  init();
+</script>
+
+</body>
+</html>
